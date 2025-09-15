@@ -1,0 +1,48 @@
+
+[flake8]
+# Configuration for flake8 linting
+
+# Set maximum line length to 120 characters (more reasonable than 88)
+max-line-length = 121
+
+# Ignore specific error codes that are too restrictive for our codebase
+ignore = 
+    # F541: f-string is missing placeholders (sometimes used for consistency)
+    F541,
+    # E402: module level import not at top of file (needed for path manipulation)
+    E402,
+    # E203: whitespace before ':' (conflicts with black)
+    E203,
+    # W503: line break before binary operator (conflicts with black)
+    W503
+
+# Exclude certain directories and files from linting
+exclude = 
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    env,
+    .env,
+    build,
+    dist,
+    *.egg-info,
+    .pytest_cache,
+    .coverage,
+    data/
+
+# Show source code for each error
+show-source = True
+
+# Show pep8 error codes
+show-pep8 = True
+
+# Count errors and warnings
+count = True
+
+# Enable specific checks
+select = E,W,F
+
+# Maximum complexity for functions (McCabe complexity)
+max-complexity = 15
+
