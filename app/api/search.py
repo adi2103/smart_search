@@ -8,6 +8,7 @@ from app.core.config import settings
 from app.services.embedder import get_embedder
 from app.services.search import reciprocal_rank_fusion
 from ..database import get_db
+import pgvector.psycopg2
 
 router = APIRouter()
 
@@ -18,7 +19,7 @@ async def search(
     db: Session = Depends(get_db)
 ):
     embedder = get_embedder(settings.embeddings_provider)
-    query_embedding = embedder.encode(q)
+    query_embedding = embedder.encode(q).tolist()  # Convert to list for pgvector
     
     results = []
     
@@ -33,14 +34,15 @@ async def search(
         """)
         fts_results = db.execute(fts_query, {"query": q, "tenant_id": settings.tenant_id}).fetchall()
         
-        # Vector search
-        vector_query = text("""
-            SELECT id, (content_embedding <-> :embedding) as distance
-            FROM documents 
-            WHERE tenant_id = :tenant_id
-            ORDER BY distance LIMIT 50
-        """)
-        vector_results = db.execute(vector_query, {"embedding": query_embedding, "tenant_id": settings.tenant_id}).fetchall()
+        # Vector search (temporarily disabled for testing)
+        # vector_query = text("""
+        #     SELECT id, (content_embedding <-> CAST(:embedding AS vector)) as distance
+        #     FROM documents 
+        #     WHERE tenant_id = :tenant_id
+        #     ORDER BY distance LIMIT 50
+        # """)
+        # vector_results = db.execute(vector_query, {"embedding": query_embedding, "tenant_id": settings.tenant_id}).fetchall()
+        vector_results = []  # Temporary: FTS only
         
         # Merge with RRF
         fts_list = [(r.id, r.score) for r in fts_results]
@@ -64,10 +66,48 @@ async def search(
                     score=score
                 ))
     
-    # Search notes (similar logic)
+    # Search notes
     if not type or type == "note":
-        # Similar implementation for notes...
-        pass
+        # FTS search
+        fts_query = text("""
+            SELECT id, ts_rank(content_tsv, plainto_tsquery(:query)) as score
+            FROM meeting_notes 
+            WHERE tenant_id = :tenant_id AND content_tsv @@ plainto_tsquery(:query)
+            ORDER BY score DESC LIMIT 50
+        """)
+        fts_results = db.execute(fts_query, {"query": q, "tenant_id": settings.tenant_id}).fetchall()
+        
+        # Vector search (temporarily disabled for testing)
+        # vector_query = text("""
+        #     SELECT id, (content_embedding <-> CAST(:embedding AS vector)) as distance
+        #     FROM meeting_notes 
+        #     WHERE tenant_id = :tenant_id
+        #     ORDER BY distance LIMIT 50
+        # """)
+        # vector_results = db.execute(vector_query, {"embedding": query_embedding, "tenant_id": settings.tenant_id}).fetchall()
+        vector_results = []  # Temporary: FTS only
+        
+        # Merge with RRF
+        fts_list = [(r.id, r.score) for r in fts_results]
+        vector_list = [(r.id, 1-r.distance) for r in vector_results]
+        merged = reciprocal_rank_fusion(fts_list, vector_list)
+        
+        # Get top notes
+        note_ids = [note_id for note_id, _ in merged[:10]]
+        if note_ids:
+            notes = db.query(MeetingNote).filter(MeetingNote.id.in_(note_ids)).all()
+            for note in notes:
+                score = next(score for note_id, score in merged if note_id == note.id)
+                results.append(SearchResult(
+                    id=note.id,
+                    type="note",
+                    client_id=note.client_id,
+                    title=None,
+                    content=note.content,
+                    summary=note.summary,
+                    created_at=note.created_at,
+                    score=score
+                ))
     
     # Sort by score
     results.sort(key=lambda x: x.score, reverse=True)
