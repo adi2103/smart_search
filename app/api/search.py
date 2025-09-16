@@ -19,7 +19,7 @@ async def search(
     db: Session = Depends(get_db)
 ):
     embedder = get_embedder(settings.embeddings_provider)
-    query_embedding = embedder.encode(q).tolist()  # Convert to list for pgvector
+    query_embedding = embedder.encode(q)  # Keep as numpy array for SQLAlchemy ORM
     
     results = []
     
@@ -34,15 +34,13 @@ async def search(
         """)
         fts_results = db.execute(fts_query, {"query": q, "tenant_id": settings.tenant_id}).fetchall()
         
-        # Vector search (temporarily disabled for testing)
-        # vector_query = text("""
-        #     SELECT id, (content_embedding <-> CAST(:embedding AS vector)) as distance
-        #     FROM documents 
-        #     WHERE tenant_id = :tenant_id
-        #     ORDER BY distance LIMIT 50
-        # """)
-        # vector_results = db.execute(vector_query, {"embedding": query_embedding, "tenant_id": settings.tenant_id}).fetchall()
-        vector_results = []  # Temporary: FTS only
+        # Vector search using SQLAlchemy ORM
+        vector_results = db.query(
+            Document.id,
+            Document.content_embedding.l2_distance(query_embedding).label('distance')
+        ).filter(
+            Document.tenant_id == settings.tenant_id
+        ).order_by('distance').limit(50).all()
         
         # Merge with RRF
         fts_list = [(r.id, r.score) for r in fts_results]
@@ -77,15 +75,13 @@ async def search(
         """)
         fts_results = db.execute(fts_query, {"query": q, "tenant_id": settings.tenant_id}).fetchall()
         
-        # Vector search (temporarily disabled for testing)
-        # vector_query = text("""
-        #     SELECT id, (content_embedding <-> CAST(:embedding AS vector)) as distance
-        #     FROM meeting_notes 
-        #     WHERE tenant_id = :tenant_id
-        #     ORDER BY distance LIMIT 50
-        # """)
-        # vector_results = db.execute(vector_query, {"embedding": query_embedding, "tenant_id": settings.tenant_id}).fetchall()
-        vector_results = []  # Temporary: FTS only
+        # Vector search using SQLAlchemy ORM
+        vector_results = db.query(
+            MeetingNote.id,
+            MeetingNote.content_embedding.l2_distance(query_embedding).label('distance')
+        ).filter(
+            MeetingNote.tenant_id == settings.tenant_id
+        ).order_by('distance').limit(50).all()
         
         # Merge with RRF
         fts_list = [(r.id, r.score) for r in fts_results]
