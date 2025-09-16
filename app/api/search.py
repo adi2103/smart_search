@@ -20,20 +20,20 @@ async def search(
 ):
     embedder = get_embedder(settings.embeddings_provider)
     query_embedding = embedder.encode(q)  # Keep as numpy array for SQLAlchemy ORM
-    
+
     results = []
-    
+
     # Search documents
     if not type or type == "document":
         # FTS search
         fts_query = text("""
             SELECT id, ts_rank(content_tsv, plainto_tsquery(:query)) as score
-            FROM documents 
+            FROM documents
             WHERE tenant_id = :tenant_id AND content_tsv @@ plainto_tsquery(:query)
             ORDER BY score DESC LIMIT 50
         """)
         fts_results = db.execute(fts_query, {"query": q, "tenant_id": settings.tenant_id}).fetchall()
-        
+
         # Vector search using SQLAlchemy ORM
         vector_results = db.query(
             Document.id,
@@ -41,12 +41,12 @@ async def search(
         ).filter(
             Document.tenant_id == settings.tenant_id
         ).order_by('distance').limit(50).all()
-        
+
         # Merge with RRF
         fts_list = [(r.id, r.score) for r in fts_results]
         vector_list = [(r.id, 1-r.distance) for r in vector_results]  # Convert distance to similarity
         merged = reciprocal_rank_fusion(fts_list, vector_list)
-        
+
         # Get top documents
         doc_ids = [doc_id for doc_id, _ in merged[:10]]
         if doc_ids:
@@ -63,18 +63,18 @@ async def search(
                     created_at=doc.created_at,
                     score=score
                 ))
-    
+
     # Search notes
     if not type or type == "note":
         # FTS search
         fts_query = text("""
             SELECT id, ts_rank(content_tsv, plainto_tsquery(:query)) as score
-            FROM meeting_notes 
+            FROM meeting_notes
             WHERE tenant_id = :tenant_id AND content_tsv @@ plainto_tsquery(:query)
             ORDER BY score DESC LIMIT 50
         """)
         fts_results = db.execute(fts_query, {"query": q, "tenant_id": settings.tenant_id}).fetchall()
-        
+
         # Vector search using SQLAlchemy ORM
         vector_results = db.query(
             MeetingNote.id,
@@ -82,12 +82,12 @@ async def search(
         ).filter(
             MeetingNote.tenant_id == settings.tenant_id
         ).order_by('distance').limit(50).all()
-        
+
         # Merge with RRF
         fts_list = [(r.id, r.score) for r in fts_results]
         vector_list = [(r.id, 1-r.distance) for r in vector_results]
         merged = reciprocal_rank_fusion(fts_list, vector_list)
-        
+
         # Get top notes
         note_ids = [note_id for note_id, _ in merged[:10]]
         if note_ids:
@@ -104,10 +104,10 @@ async def search(
                     created_at=note.created_at,
                     score=score
                 ))
-    
+
     # Sort by score
     results.sort(key=lambda x: x.score, reverse=True)
-    
+
     return SearchResponse(
         query=q,
         type=type,

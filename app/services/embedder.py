@@ -10,7 +10,7 @@ class Embedder(ABC):
 class LocalEmbedder(Embedder):
     def __init__(self):
         self.model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
-    
+
     def encode(self, text: str) -> np.ndarray:
         return self.model.encode(text, normalize_embeddings=True)
 

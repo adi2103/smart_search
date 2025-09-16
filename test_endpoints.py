@@ -46,17 +46,17 @@ def test_health():
 if __name__ == "__main__":
     print("Testing WealthTech Smart Search API Endpoints")
     print("=" * 50)
-    
+
     # Test health first
     test_health()
     print()
-    
+
     # Test document upload
     test_document_upload()
     print()
-    
+
     # Test note upload
     test_note_upload()
     print()
-    
+
     print("Endpoint testing complete!")

@@ -17,11 +17,11 @@ async def create_note(
 ):
     embedder = get_embedder(settings.embeddings_provider)
     summarizer = get_summarizer(settings.summarizer)
-    
+
     # Generate embedding and summary
     embedding = embedder.encode(note.content)
     summary = summarizer.summarize(note.content)
-    
+
     # Create note
     db_note = MeetingNote(
         tenant_id=settings.tenant_id,
@@ -30,11 +30,11 @@ async def create_note(
         summary=summary,
         content_embedding=embedding
     )
-    
+
     db.add(db_note)
     db.commit()
     db.refresh(db_note)
-    
+
     return NoteResponse(
         id=db_note.id,
         client_id=db_note.client_id,

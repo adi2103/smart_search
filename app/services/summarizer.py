@@ -12,7 +12,7 @@ class ExtractiveSummarizer(Summarizer):
     def __init__(self, sentence_count: int = 3):
         self.summarizer = LexRankSummarizer()
         self.sentence_count = sentence_count
-    
+
     def summarize(self, text: str) -> str:
         parser = PlaintextParser.from_string(text, Tokenizer("english"))
         summary = self.summarizer(parser.document, self.sentence_count)

@@ -17,11 +17,11 @@ async def create_document(
 ):
     embedder = get_embedder(settings.embeddings_provider)
     summarizer = get_summarizer(settings.summarizer)
-    
+
     # Generate embedding and summary
     embedding = embedder.encode(document.content)
     summary = summarizer.summarize(document.content)
-    
+
     # Create document
     db_document = Document(
         tenant_id=settings.tenant_id,
@@ -31,11 +31,11 @@ async def create_document(
         summary=summary,
         content_embedding=embedding
     )
-    
+
     db.add(db_document)
     db.commit()
     db.refresh(db_document)
-    
+
     return DocumentResponse(
         id=db_document.id,
         client_id=db_document.client_id,

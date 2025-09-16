@@ -5,7 +5,7 @@ class Settings(BaseSettings):
     tenant_id: int = 1
     embeddings_provider: str = "local"
     summarizer: str = "extractive"
-    
+
     class Config:
         env_file = ".env"
 
