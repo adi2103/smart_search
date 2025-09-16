@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/wealthtech_db
+      - TENANT_ID=1
+      - EMBEDDINGS_PROVIDER=local
+      - SUMMARIZER=extractive
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app
+
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=wealthtech_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  pg_data:
