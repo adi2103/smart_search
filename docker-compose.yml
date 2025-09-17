@@ -7,7 +7,7 @@ services:
       - DATABASE_URL=postgresql://user:password@db:5432/wealthtech_db
       - TENANT_ID=1
       - EMBEDDINGS_PROVIDER=local
-      - SUMMARIZER=extractive
+      - SUMMARIZER=${SUMMARIZER:-extractive}
       - GEMINI_API_KEY=${GEMINI_API_KEY:-}
     depends_on:
       - db
