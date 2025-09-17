@@ -37,9 +37,11 @@ Core principles and MVP scope:
 - **Optional**: Abstraction allows switching to external APIs (e.g., Gemini/OpenAI) if higher quality is needed.
 - **Abstraction**: `Embedder` interface with providers (`local`, `openai`, `gemini`).
 
-### Summarization
-- **Default (MVP)**: Extractive summarization using **Sumy (LexRank)** for safety, speed, and deterministic output.
-- **Optional**: Abstractive summarization using HuggingFace Transformers (e.g., **BART/T5**) when richer summaries are preferred.
+### Summarization (3-Phase Strategy)
+- **Phase 1 (MVP)**: Extractive summarization using **Sumy (LexRank)** for safety, speed, and deterministic output.
+- **Phase 2 (AI-Enhanced)**: Abstractive summarization using **Gemini API** with custom prompts for financial domain optimization.
+- **Phase 3 (Self-Hosted AI)**: Abstractive summarization using **HuggingFace BART** via transformers pipeline for full control and privacy.
+- **Configuration**: Provider switch via `SUMMARIZER=extractive|gemini|bart` environment variable.
 - **Strategy**: Precompute and store `summary` at ingestion to keep search latency low.
 
 ### Ranking
@@ -246,7 +248,8 @@ CREATE INDEX idx_notes_embedding     ON meeting_notes USING ivfflat (content_emb
 
 ### 6.3 Summarizer
 - **Extractive**: Sumy (LexRank) with configurable sentence count (e.g., 3–5).
-- **Abstractive (optional)**: HF pipeline with BART/T5; chunk large texts; store results.
+- **Abstractive (Gemini)**: Google Gemini API with custom financial domain prompts for enhanced quality.
+- **Abstractive (BART)**: HuggingFace BART pipeline for self-hosted abstractive summarization with full privacy control.
 
 ### 6.4 Hybrid Ranker (RRF)
 - Run FTS (ts_rank) and vector similarity queries (distance ascending).
@@ -374,22 +377,24 @@ httpx
 
 ---
 
-## 11. Development Plan & Time Estimates (~12 hours)
+## 11. Development Plan & Time Estimates (~16 hours)
 
 | Task | Estimate |
 |------|----------|
 | Project scaffolding (FastAPI, structure, Pydantic models) | 1.0h |
 | DB setup (Docker, pgvector, schema & indexes) | 1.5h |
 | Embedder (local MiniLM) abstraction & wiring | 1.0h |
-| Summarizer (Sumy) with optional HF abstractive | 1.5h |
+| Summarizer Phase 1 (Sumy LexRank extractive) | 1.5h |
 | Ingestion endpoints (docs/notes) + persistence | 1.5h |
+| Summarizer Phase 2 (Gemini API abstractive with custom summarization prompts) | 2.0h |
+| Summarizer Phase 3 (HuggingFace BART self-hosted abstractive) | 2.0h |
 | Search pipeline (FTS + vector + RRF + response shaping) | 2.0h |
 | API docs (OpenAPI via FastAPI) + README usage examples | 1.0h |
 | Tests (unit + integration) | 1.5h |
 | Docker Compose & local runbook | 1.0h |
 | Buffer/Polish | 1.0h |
 
-**Total**: ~12 hours
+**Total**: ~16 hours
 
 ---
 
