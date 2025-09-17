@@ -20,7 +20,7 @@ async def create_document(
 
     # Generate embedding and summary
     embedding = embedder.encode(document.content)
-    summary = summarizer.summarize(document.content)
+    summary = summarizer.summarize(document.content, content_type="document")
 
     # Create document
     db_document = Document(

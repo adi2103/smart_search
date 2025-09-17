@@ -20,7 +20,7 @@ async def create_note(
 
     # Generate embedding and summary
     embedding = embedder.encode(note.content)
-    summary = summarizer.summarize(note.content)
+    summary = summarizer.summarize(note.content, content_type="note")
 
     # Create note
     db_note = MeetingNote(

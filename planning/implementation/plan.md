@@ -41,7 +41,7 @@ Implementation approach:
 4. Test with financial documents to verify improved abstractive quality
 5. Ensure backward compatibility with existing extractive summarization
 
-Expected outcome: SUMMARIZER=gemini produces high-quality abstractive summaries using Gemini API with financial domain optimization.
+Expected outcome: SUMMARIZER=gemini produces high-quality abstractive summaries using Gemini API with summarization domain prompting for meeting summaries, notes and documents.
 ```
 
 ### Step 6 Prompt: Implement HuggingFace BART abstractive summarization (Phase 3)
