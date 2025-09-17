@@ -39,7 +39,7 @@ Core principles and MVP scope:
 
 ### Summarization (3-Phase Strategy)
 - **Phase 1 (MVP)**: Extractive summarization using **Sumy (LexRank)** for safety, speed, and deterministic output.
-- **Phase 2 (AI-Enhanced)**: Abstractive summarization using **Gemini API** with custom prompts for financial domain optimization.
+- **Phase 2 (AI-Enhanced)**: Abstractive summarization using **Gemini API** with custom prompts for custom summarization optimization.
 - **Phase 3 (Self-Hosted AI)**: Abstractive summarization using **HuggingFace BART** via transformers pipeline for full control and privacy.
 - **Configuration**: Provider switch via `SUMMARIZER=extractive|gemini|bart` environment variable.
 - **Strategy**: Precompute and store `summary` at ingestion to keep search latency low.
@@ -248,7 +248,7 @@ CREATE INDEX idx_notes_embedding     ON meeting_notes USING ivfflat (content_emb
 
 ### 6.3 Summarizer
 - **Extractive**: Sumy (LexRank) with configurable sentence count (e.g., 3–5).
-- **Abstractive (Gemini)**: Google Gemini API with custom financial domain prompts for enhanced quality.
+- **Abstractive (Gemini)**: Google Gemini API with custom summarization prompts for enhanced quality.
 - **Abstractive (BART)**: HuggingFace BART pipeline for self-hosted abstractive summarization with full privacy control.
 
 ### 6.4 Hybrid Ranker (RRF)

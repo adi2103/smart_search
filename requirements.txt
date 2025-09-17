@@ -8,3 +8,7 @@ pgvector
 sentence-transformers
 sumy
 httpx
+# AI Summarization Phase 2 & 3
+google-generativeai
+transformers
+torch

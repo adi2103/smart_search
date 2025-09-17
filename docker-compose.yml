@@ -8,6 +8,7 @@ services:
       - TENANT_ID=1
       - EMBEDDINGS_PROVIDER=local
       - SUMMARIZER=extractive
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
     depends_on:
       - db
     ports:

@@ -4,84 +4,70 @@
 - [x] Step 1: Fix database initialization and schema setup
 - [x] Step 2: Resolve Python import path issues
 - [x] Step 3: Restart and verify API container functionality
-- [ ] Step 4: Test all three API endpoints
-- [ ] Step 5: Add basic error handling and validation
-- [ ] Step 6: Create integration test for end-to-end workflow
+- [x] Step 4: Test all three API endpoints
+- [ ] Step 5: Implement Gemini API abstractive summarization (Phase 2)
+- [ ] Step 6: Implement HuggingFace BART abstractive summarization (Phase 3)
+- [ ] Step 7: Add basic error handling and validation
+- [ ] Step 8: Create integration test for end-to-end workflow
 
 ## Implementation Prompts
 
-### Step 1 Prompt: Fix database initialization and schema setup
+### Step 1 Prompt: Fix database initialization and schema setup ✅ COMPLETED
+
+### Step 2 Prompt: Resolve Python import path issues ✅ COMPLETED
+
+### Step 3 Prompt: Restart and verify API container functionality ✅ COMPLETED
+
+### Step 4 Prompt: Test all three API endpoints ✅ COMPLETED
+
+### Step 5 Prompt: Implement Gemini API abstractive summarization (Phase 2)
 
 ```
-Create database initialization script for WealthTech Smart Search API. The database needs PostgreSQL with pgvector extension and tables for multi-tenant architecture (tenant_id=1 for MVP).
+Implement Gemini API abstractive summarization as Phase 2 of the 3-phase AI summarization strategy for WealthTech Smart Search API.
 
 Requirements:
-- Create init.sql with pgvector extension
-- Add tables: tenants, clients, documents, meeting_notes
-- Include GIN indexes for full-text search (content_tsv columns)
-- Add vector indexes for embeddings (384-dim vectors)
-- Update docker-compose.yml to use init script
-- Restart database container and verify schema
+- Create GeminiSummarizer class following the pattern from /Users/adarwal/code/project_20250801_1553_sierra/src/llm_adapter.py
+- Use plug-and-play design with minimal changes to existing summarizer.py
+- Add SUMMARIZER=gemini configuration support
+- Create financial domain-specific prompts for better summarization quality
+- Handle API errors gracefully with fallback to extractive summarization
+- Add google-generativeai dependency to requirements.txt
+- Update Docker container to support Gemini API key via environment variable
 
-Reference the design document schema in WealthTech_Smart_Search_Design.md for exact DDL.
+Implementation approach:
+1. Study the GeminiAdapter pattern from Sierra project
+2. Create minimal GeminiSummarizer class that integrates cleanly
+3. Add configuration support for GEMINI_API_KEY environment variable
+4. Test with financial documents to verify improved abstractive quality
+5. Ensure backward compatibility with existing extractive summarization
 
-Expected outcome: Database running with all tables and indexes, ready for API connection.
+Expected outcome: SUMMARIZER=gemini produces high-quality abstractive summaries using Gemini API with financial domain optimization.
 ```
 
-### Step 2 Prompt: Resolve Python import path issues
+### Step 6 Prompt: Implement HuggingFace BART abstractive summarization (Phase 3)
 
 ```
-Fix Python import path issues in the WealthTech Smart Search FastAPI application that are preventing container startup.
+Implement HuggingFace BART abstractive summarization as Phase 3 of the 3-phase AI summarization strategy.
 
-Current status: 13 files, 30 symbols implemented but API container crashes on import.
+Requirements:
+- Create BARTSummarizer class using transformers pipeline
+- Add SUMMARIZER=bart configuration support
+- Use facebook/bart-large-cnn model for financial document summarization
+- Handle model loading and caching efficiently
+- Add transformers dependency and update Docker container
+- Ensure self-hosted operation with no external API dependencies
 
-Tasks:
-- Use code analysis tools to examine current import structure
-- Identify missing __init__.py files or incorrect relative imports
-- Fix import paths in FastAPI modules (app/main.py, app/api/, app/services/)
-- Ensure all dependencies are properly imported
-- Test imports work without errors
+Implementation approach:
+1. Create BARTSummarizer using HuggingFace transformers pipeline
+2. Add model caching and efficient loading
+3. Handle long documents with chunking if needed
+4. Test summarization quality vs Gemini and extractive methods
+5. Update Docker container with model caching volume
 
-Expected outcome: FastAPI application starts successfully without import errors.
+Expected outcome: SUMMARIZER=bart produces high-quality abstractive summaries using self-hosted BART model.
 ```
 
-### Step 3 Prompt: Restart and verify API container functionality
-
-```
-Get the WealthTech Smart Search API container running and verify basic functionality after fixing imports.
-
-Tasks:
-- Rebuild API container with fixed import paths
-- Start API container and verify database connection
-- Check FastAPI auto-generated docs at /docs endpoint
-- Verify all three endpoints are accessible: POST /clients/{id}/documents, POST /clients/{id}/notes, GET /search
-- Test basic health/status endpoint
-
-Expected outcome: API container running, FastAPI docs accessible, endpoints responding (even with validation errors).
-```
-
-### Step 4 Prompt: Test all three API endpoints
-
-```
-Test and verify all three WealthTech Smart Search API endpoints work with proper request/response handling.
-
-Endpoints to test:
-1. POST /clients/{id}/documents - upload document with title and content
-2. POST /clients/{id}/notes - upload meeting note with content  
-3. GET /search?q=...&type=document|note - search with query parameter
-
-Tasks:
-- Create test client record if needed (tenant_id=1)
-- Test document upload with sample data
-- Test note upload with sample data
-- Test search functionality with basic query
-- Verify embeddings generation and summarization work
-- Check response formats match design specifications
-
-Expected outcome: All endpoints functional with embeddings, summaries, and search results.
-```
-
-### Step 5 Prompt: Add basic error handling and validation
+### Step 7 Prompt: Add basic error handling and validation
 
 ```
 Implement proper error handling and input validation for the WealthTech Smart Search API.
@@ -93,34 +79,37 @@ Tasks:
 - Ensure proper error messages with clear descriptions
 - Add database connection error handling
 - Validate required fields in request bodies
+- Add graceful fallback for AI summarization failures
 
 Expected outcome: API handles invalid requests gracefully with proper HTTP status codes and error messages.
 ```
 
-### Step 6 Prompt: Create integration test for end-to-end workflow
+### Step 8 Prompt: Create integration test for end-to-end workflow
 
 ```
-Create integration test to verify the complete WealthTech Smart Search workflow from document upload to search results.
+Create integration test to verify the complete WealthTech Smart Search workflow including all 3 summarization phases.
 
 Test workflow:
 1. Create/verify test client exists
-2. Upload a sample document via POST /clients/{id}/documents
-3. Upload a sample meeting note via POST /clients/{id}/notes  
-4. Perform search query that should return both items
-5. Verify search results include summaries and proper RRF ranking
+2. Test all 3 summarization modes (extractive, gemini, bart)
+3. Upload sample documents and notes with each summarization mode
+4. Perform search queries that return results from all modes
+5. Verify search results include proper summaries and RRF ranking
 6. Test different search types (document only, note only, both)
+7. Compare summarization quality across all 3 phases
 
-Expected outcome: Complete integration test passes, demonstrating hybrid search with summarization works end-to-end.
+Expected outcome: Complete integration test passes, demonstrating all 3 AI summarization phases work with hybrid search.
 ```
 
 ## Usage Instructions
 
 Execute each prompt in sequence. Each prompt is designed to be self-contained and will result in working, demoable functionality. 
 
-**To start:** Copy and paste "Step 1 Prompt" to begin database initialization.
+**Current Status:** Steps 1-4 completed. Ready for Step 5 (Gemini integration).
 
 ## Current Context
-- Design document: WealthTech_Smart_Search_Design.md
+- Design document: WealthTech_Smart_Search_Design.md (updated with 3-phase strategy)
 - Status document: README.md  
-- Implementation: 75% complete (13 files, 30 symbols)
+- Implementation: 85% complete (core functionality working)
 - Architecture: FastAPI + SQLAlchemy + PostgreSQL + pgvector
+- Next: AI-based summarization phases (Gemini → BART)
