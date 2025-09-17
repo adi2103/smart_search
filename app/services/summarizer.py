@@ -47,8 +47,8 @@ class GeminiSummarizer(Summarizer):
 You are a financial advisor's assistant summarizing meeting notes. Create a concise summary for financial advisors to quickly understand client interactions.
 
 Requirements:
-- Focus on key client concerns, decisions made, and action items
-- Highlight investment preferences, risk tolerance, and financial goals discussed
+- Focus on key client information, decisions made, and action items
+- Highlight any details that could impact financial planning (income, expenses, life changes, goals, concerns)
 - Use professional advisory language
 - Keep the summary to 2-3 sentences maximum
 - Emphasize actionable insights for the advisor's next client interaction
@@ -59,14 +59,14 @@ Meeting notes to summarize:
 Advisory Summary:"""
         else:  # document
             prompt = f"""
-You are a financial document analyst summarizing client documents for financial advisors. Create a concise summary to help advisors quickly understand document contents.
+You are a financial advisor's assistant summarizing client documents. Create a concise summary to help advisors quickly understand document contents.
 
 Requirements:
-- Focus on key financial insights, recommendations, and important metrics
-- Highlight investment strategies, portfolio performance, and risk assessments
-- Use professional financial terminology
+- Focus on key client information and important details
+- Highlight any information relevant to financial planning (assets, liabilities, income, expenses, life events, goals)
+- Use professional advisory language
 - Keep the summary to 2-3 sentences maximum
-- Emphasize critical information advisors need for client consultations
+- Emphasize critical information advisors need for comprehensive client understanding
 
 Document to summarize:
 {text}
