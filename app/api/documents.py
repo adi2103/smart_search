@@ -1,12 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 from app.schemas.schemas import DocumentCreate, DocumentResponse
 from app.models.database import Document
 from app.core.config import settings
 from app.services.embedder import get_embedder
 from app.services.summarizer import get_summarizer
+from app.utils.validation import validate_client_exists, validate_content_length
 from ..database import get_db
+import logging
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 @router.post("/{client_id}/documents", response_model=DocumentResponse, status_code=201)
@@ -15,30 +19,74 @@ async def create_document(
     document: DocumentCreate,
     db: Session = Depends(get_db)
 ):
-    embedder = get_embedder(settings.embeddings_provider)
-    summarizer = get_summarizer(settings.summarizer)
+    try:
+        # Validate client exists and belongs to tenant
+        validate_client_exists(client_id, db)
+        
+        # Validate content length
+        validate_content_length(document.content)
+        
+        # Get services
+        embedder = get_embedder(settings.embeddings_provider)
+        summarizer = get_summarizer(settings.summarizer)
 
-    embedding = embedder.encode(document.content)
-    summary = summarizer.summarize(document.content, content_type="document")
+        # Generate embedding with error handling
+        try:
+            embedding = embedder.encode(document.content)
+        except Exception as e:
+            logger.error(f"Embedding generation failed: {e}")
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to generate document embedding"
+            )
 
-    db_document = Document(
-        tenant_id=settings.tenant_id,
-        client_id=client_id,
-        title=document.title,
-        content=document.content,
-        summary=summary,
-        content_embedding=embedding
-    )
+        # Generate summary with error handling (has built-in fallback)
+        try:
+            summary = summarizer.summarize(document.content, content_type="document")
+        except Exception as e:
+            logger.error(f"Summarization failed: {e}")
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to generate document summary"
+            )
 
-    db.add(db_document)
-    db.commit()
-    db.refresh(db_document)
+        # Create document
+        db_document = Document(
+            tenant_id=settings.tenant_id,
+            client_id=client_id,
+            title=document.title,
+            content=document.content,
+            summary=summary,
+            content_embedding=embedding
+        )
 
-    return DocumentResponse(
-        id=db_document.id,
-        client_id=db_document.client_id,
-        title=db_document.title,
-        content=db_document.content,
-        summary=db_document.summary,
-        created_at=db_document.created_at
-    )
+        db.add(db_document)
+        db.commit()
+        db.refresh(db_document)
+
+        return DocumentResponse(
+            id=db_document.id,
+            client_id=db_document.client_id,
+            title=db_document.title,
+            content=db_document.content,
+            summary=db_document.summary,
+            created_at=db_document.created_at
+        )
+        
+    except HTTPException:
+        # Re-raise HTTP exceptions (validation errors)
+        raise
+    except SQLAlchemyError as e:
+        logger.error(f"Database error in create_document: {e}")
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail="Database operation failed"
+        )
+    except Exception as e:
+        logger.error(f"Unexpected error in create_document: {e}")
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error"
+        )

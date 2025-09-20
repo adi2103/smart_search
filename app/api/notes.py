@@ -1,12 +1,16 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 from app.schemas.schemas import NoteCreate, NoteResponse
 from app.models.database import MeetingNote
 from app.core.config import settings
 from app.services.embedder import get_embedder
 from app.services.summarizer import get_summarizer
+from app.utils.validation import validate_client_exists, validate_content_length
 from ..database import get_db
+import logging
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 @router.post("/{client_id}/notes", response_model=NoteResponse, status_code=201)
@@ -15,28 +19,72 @@ async def create_note(
     note: NoteCreate,
     db: Session = Depends(get_db)
 ):
-    embedder = get_embedder(settings.embeddings_provider)
-    summarizer = get_summarizer(settings.summarizer)
+    try:
+        # Validate client exists and belongs to tenant
+        validate_client_exists(client_id, db)
+        
+        # Validate content length
+        validate_content_length(note.content)
+        
+        # Get services
+        embedder = get_embedder(settings.embeddings_provider)
+        summarizer = get_summarizer(settings.summarizer)
 
-    embedding = embedder.encode(note.content)
-    summary = summarizer.summarize(note.content, content_type="note")
+        # Generate embedding with error handling
+        try:
+            embedding = embedder.encode(note.content)
+        except Exception as e:
+            logger.error(f"Embedding generation failed: {e}")
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to generate note embedding"
+            )
 
-    db_note = MeetingNote(
-        tenant_id=settings.tenant_id,
-        client_id=client_id,
-        content=note.content,
-        summary=summary,
-        content_embedding=embedding
-    )
+        # Generate summary with error handling (has built-in fallback)
+        try:
+            summary = summarizer.summarize(note.content, content_type="note")
+        except Exception as e:
+            logger.error(f"Summarization failed: {e}")
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to generate note summary"
+            )
 
-    db.add(db_note)
-    db.commit()
-    db.refresh(db_note)
+        # Create note
+        db_note = MeetingNote(
+            tenant_id=settings.tenant_id,
+            client_id=client_id,
+            content=note.content,
+            summary=summary,
+            content_embedding=embedding
+        )
 
-    return NoteResponse(
-        id=db_note.id,
-        client_id=db_note.client_id,
-        content=db_note.content,
-        summary=db_note.summary,
-        created_at=db_note.created_at
-    )
+        db.add(db_note)
+        db.commit()
+        db.refresh(db_note)
+
+        return NoteResponse(
+            id=db_note.id,
+            client_id=db_note.client_id,
+            content=db_note.content,
+            summary=db_note.summary,
+            created_at=db_note.created_at
+        )
+        
+    except HTTPException:
+        # Re-raise HTTP exceptions (validation errors)
+        raise
+    except SQLAlchemyError as e:
+        logger.error(f"Database error in create_note: {e}")
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail="Database operation failed"
+        )
+    except Exception as e:
+        logger.error(f"Unexpected error in create_note: {e}")
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error"
+        )
