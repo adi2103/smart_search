@@ -1,7 +1,5 @@
 # WealthTech Smart Search API
 
-# WealthTech Smart Search API
-
 ## 🚀 Quick Start with Docker
 
 ### 1. Clone Repository
@@ -37,13 +35,13 @@ curl http://localhost:8000/health
 open http://localhost:8000/docs
 ```
 
-### 4. Optional: Switch AI Methods
+### 4. Various summarization methods
 ```bash
-# Use BART (local, no API key needed)
+# Use abstractive BART model summarization (local, no API key needed)
 export SUMMARIZER="bart"
 docker compose restart api
 
-# Use extractive (local, no API key needed)  
+# Use extractive Sumy model (local, no API key needed)
 export SUMMARIZER="extractive"
 docker compose restart api
 
@@ -54,23 +52,8 @@ docker compose restart api
 
 ### 2. Access the API
 - **API**: http://localhost:8000
-- **Health Check**: http://localhost:8000/health  
+- **Health Check**: http://localhost:8000/health
 - **Interactive Docs**: http://localhost:8000/docs
-
-### 3. Optional: Switch AI Methods
-```bash
-# Use BART (local, no API key needed)
-export SUMMARIZER="bart"
-docker compose restart api
-
-# Use extractive (local, no API key needed)  
-export SUMMARIZER="extractive"
-docker compose restart api
-
-# Back to Gemini (default)
-export SUMMARIZER="gemini"
-docker compose restart api
-```
 
 ## 📡 API Endpoints
 
@@ -78,6 +61,56 @@ docker compose restart api
 - `POST /clients/{id}/notes` - Upload meeting notes  
 - `GET /search?q=query&type=document|note` - Hybrid search
 - `GET /health` - Health check
+
+## 🔍 Example API Usage
+
+### Upload Document
+```bash
+curl -X POST "http://localhost:8000/clients/1/documents" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Investment Portfolio Analysis",
+    "content": "This comprehensive analysis covers portfolio diversification strategies, risk assessment methodologies, and performance optimization techniques for institutional investors."
+  }'
+```
+
+### Upload Meeting Note
+```bash
+curl -X POST "http://localhost:8000/clients/1/notes" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "Client meeting focused on retirement planning. Discussed 401k rollover options and asset allocation strategy. Client prefers moderate risk tolerance with 60/40 stock/bond allocation."
+  }'
+```
+
+### Search Documents and Notes
+```bash
+# Search all content
+curl "http://localhost:8000/search?q=portfolio%20diversification"
+
+# Search only documents
+curl "http://localhost:8000/search?q=investment&type=document"
+
+# Search only notes
+curl "http://localhost:8000/search?q=retirement&type=note"
+```
+
+### Example Search Response
+```json
+{
+  "query": "portfolio diversification",
+  "results": [
+    {
+      "id": 1,
+      "type": "document",
+      "title": "Investment Portfolio Analysis",
+      "summary": "Comprehensive analysis covering portfolio diversification strategies and risk assessment for institutional investors.",
+      "content": "This comprehensive analysis covers...",
+      "score": 0.85
+    }
+  ]
+}
+```
 
 ## 🏗️ Architecture
 
@@ -119,16 +152,38 @@ python -m pytest tests/test_unit.py --cov=src --cov-report=term-missing
 - **Database**: PostgreSQL 16 with pgvector extension
 - **AI**: Gemini API (default), BART, Extractive summarization
 - **Embeddings**: sentence-transformers (local)
-- **Search**: Hybrid FTS + vector with Reciprocal Rank Fusion
+- **Search**: Hybrid FTS + pg vector search with Reciprocal Rank Fusion
 - **Deployment**: Docker Compose
 
-## 🆘 Troubleshooting
+## 🔍 Search Features
 
-**API Key Error?**
-```bash
-export GEMINI_API_KEY="your-key-here"
-docker compose restart api
-```
+### Full-Text Keyword Search
+- PostgreSQL FTS with ranking
+- Exact keyword matching
+- Phrase search support
+
+### Semantic Vector Search  
+- sentence-transformers embeddings
+- pgvector similarity search
+- Context-aware matching
+
+### Hybrid Search
+- Combines FTS + vector results
+- Reciprocal Rank Fusion (RRF) algorithm
+- Optimized relevance scoring
+
+### Document Summaries
+- **Gemini API**: Advanced AI summarization (default)
+- **BART**: Local transformer model
+- **Extractive**: Simple sentence extraction
+
+## 📚 API Documentation
+
+- **Interactive Docs**: http://localhost:8000/docs (Swagger UI)
+- **ReDoc**: http://localhost:8000/redoc (Alternative format)
+- **OpenAPI Schema**: http://localhost:8000/openapi.json
+
+## 🆘 Troubleshooting
 
 **Database Issues?**
 ```bash
