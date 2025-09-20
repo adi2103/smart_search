@@ -81,7 +81,7 @@ See `WealthTech_Smart_Search_Design.md` for complete architecture details, API s
 
 ### Simple Setup
 ```bash
-# Install all dependencies (includes all AI methods)
+# Install all dependencies (includes all AI methods and testing)
 pip install -r requirements.txt
 
 # Set your Gemini API key
@@ -95,11 +95,8 @@ export SUMMARIZER="gemini"  # or "extractive" or "bart"
 
 ### Quick Start
 ```bash
-# Copy environment template
-cp .env.example .env
-
-# Edit .env and add your GEMINI_API_KEY
-nano .env
+# Set your Gemini API key
+export GEMINI_API_KEY="your-api-key"
 
 # Start the application (all AI methods included)
 docker compose up -d
@@ -108,13 +105,13 @@ docker compose up -d
 ### Switch AI Methods
 ```bash
 # Use Gemini (default - requires API key)
-echo "SUMMARIZER=gemini" >> .env
+export SUMMARIZER="gemini"
 
 # Use BART (local, no API key needed)
-echo "SUMMARIZER=bart" >> .env
+export SUMMARIZER="bart"
 
 # Use extractive (local, no API key needed)
-echo "SUMMARIZER=extractive" >> .env
+export SUMMARIZER="extractive"
 
 # Restart to apply changes
 docker compose restart api
@@ -123,16 +120,9 @@ docker compose restart api
 
 ## Testing
 
-### Test Structure
-- `tests/test_unit.py` - Unit tests for core business logic and regression prevention
-- `tests/test_integration.py` - Integration tests for complete API functionality
-
 ### Running Tests
 
 ```bash
-# Install test dependencies
-pip install -r tests/requirements.txt
-
 # Run unit tests (fast, ~14s)
 python -m pytest tests/test_unit.py -v
 

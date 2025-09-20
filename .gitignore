@@ -1,10 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
 
-.venv
-logs
-/extras/
-/chats/
+# Testing
+.pytest_cache/
+.coverage*
+htmlcov/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
 .DS_Store
-**/**/__pycache__
-.amazonq
-.references
+Thumbs.db
 
+# Logs
+*.log
+
+# Chat/session files
+*.json
+
+# Docker
+.dockerignore
+
+# Temporary files
+*.tmp
+*.temp
