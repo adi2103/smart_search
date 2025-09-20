@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from app.models.database import Client
-from app.core.config import settings
+from src.models.database import Client
+from src.config import settings
 
 def validate_client_exists(client_id: int, db: Session) -> Client:
     """Validate client exists and belongs to tenant_id=1"""

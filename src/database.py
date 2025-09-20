@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException
-from app.core.config import settings
+from src.config import settings
 import logging
 
 logger = logging.getLogger(__name__)

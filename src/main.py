@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from app.api import documents, notes, search
-from app.core.config import settings
+from src.api import documents, notes, search
+from src.config import settings
 import logging
 
 # Configure logging
@@ -15,10 +15,10 @@ app = FastAPI(
     version="1.0.0"
 )
 
-app.include_router(documents.router, prefix="/clients", tags=["documents"])
-app.include_router(notes.router, prefix="/clients", tags=["notes"])
-app.include_router(search.router, tags=["search"])
+src.include_router(documents.router, prefix="/clients", tags=["documents"])
+src.include_router(notes.router, prefix="/clients", tags=["notes"])
+src.include_router(search.router, tags=["search"])
 
-@app.get("/health")
+@src.get("/health")
 async def health_check():
     return {"status": "healthy"}

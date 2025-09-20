@@ -3,12 +3,12 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from typing import Optional, List
-from app.api.schemas import SearchResponse, SearchResult
-from app.models.database import Document, MeetingNote
-from app.core.config import settings
-from app.utils_ai.embedder import get_embedder
-from app.utils_ai.search_utils import reciprocal_rank_fusion
-from app.utils.validation import validate_search_query
+from src.api.schemas import SearchResponse, SearchResult
+from src.models.database import Document, MeetingNote
+from src.config import settings
+from src.utils.embedder import get_embedder
+from src.utils.search_utils import reciprocal_rank_fusion
+from src.utils.validation import validate_search_query
 from ..database import get_db
 import logging
 
