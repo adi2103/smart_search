@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
-from app.schemas.schemas import NoteCreate, NoteResponse
+from app.api.schemas import NoteCreate, NoteResponse
 from app.models.database import MeetingNote
 from app.core.config import settings
-from app.services.embedder import get_embedder
-from app.services.summarizer import get_summarizer
+from app.utils_ai.embedder import get_embedder
+from app.utils_ai.summarizer import get_summarizer
 from app.utils.validation import validate_client_exists, validate_content_length
 from ..database import get_db
 import logging

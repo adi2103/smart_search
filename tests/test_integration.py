@@ -145,7 +145,7 @@ class TestWealthTechAPI:
             assert "summary" in result
             assert "content" in result
 
-        # Verify RRF ranking produces reasonable scores
+        # Verify RRF search_utils produces reasonable scores
         scores = [r["score"] for r in results["results"]]
         assert all(score > 0 for score in scores), "All scores should be positive"
         assert len(set(scores)) > 1 or len(scores) == 1, "Should have varied scores or single result"

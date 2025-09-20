@@ -6,9 +6,9 @@ import pytest
 from unittest.mock import patch, MagicMock
 import os
 
-from app.services.summarizer import get_summarizer, ExtractiveSummarizer, GeminiSummarizer, BARTSummarizer
-from app.services.search import reciprocal_rank_fusion
-from app.services.embedder import get_embedder, LocalEmbedder
+from app.utils_ai.summarizer import get_summarizer, ExtractiveSummarizer, GeminiSummarizer, BARTSummarizer
+from app.utils_ai.search import reciprocal_rank_fusion
+from app.utils_ai.embedder import get_embedder, LocalEmbedder
 from app.utils.validation import validate_client_exists, validate_content_length, validate_search_query
 from app.core.config import settings
 from fastapi import HTTPException
@@ -49,7 +49,7 @@ class TestSummarizerService:
         result = summarizer.summarize(single, content_type="document")
         assert result == single
 
-    @patch('app.services.summarizer.ExtractiveSummarizer')
+    @patch('app.utils_ai.summarizer.ExtractiveSummarizer')
     def test_gemini_fallback_mechanism(self, mock_extractive):
         """Test Gemini falls back to extractive on failures"""
         if not os.getenv("GEMINI_API_KEY"):
