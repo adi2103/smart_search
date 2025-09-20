@@ -18,11 +18,9 @@ async def create_note(
     embedder = get_embedder(settings.embeddings_provider)
     summarizer = get_summarizer(settings.summarizer)
 
-    # Generate embedding and summary
     embedding = embedder.encode(note.content)
     summary = summarizer.summarize(note.content, content_type="note")
 
-    # Create note
     db_note = MeetingNote(
         tenant_id=settings.tenant_id,
         client_id=client_id,

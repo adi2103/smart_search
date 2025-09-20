@@ -8,7 +8,6 @@ from app.core.config import settings
 from app.services.embedder import get_embedder
 from app.services.search import reciprocal_rank_fusion
 from ..database import get_db
-import pgvector.psycopg2
 
 router = APIRouter()
 
@@ -105,9 +104,7 @@ async def search(
                     score=score
                 ))
 
-    # Sort by score
-    results.sort(key=lambda x: x.score, reverse=True)
-
+    # Results are already in RRF-optimized order, no additional sorting needed
     return SearchResponse(
         query=q,
         type=type,

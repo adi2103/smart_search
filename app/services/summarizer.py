@@ -97,7 +97,7 @@ Advisory Summary:"""
 
 class BARTSummarizer(Summarizer):
     _model_cache = None  # Class-level cache for model
-    
+
     def __init__(self):
         try:
             # Use cached model if available
@@ -111,7 +111,7 @@ class BARTSummarizer(Summarizer):
                     model_kwargs={"cache_dir": "/tmp/transformers_cache"}
                 )
                 print("BART model loaded successfully")
-            
+
             self.summarizer = BARTSummarizer._model_cache
             self.available = True
         except ImportError:
@@ -127,7 +127,7 @@ class BARTSummarizer(Summarizer):
         try:
             # BART has a 1024 token limit, chunk longer texts
             max_chunk_length = 800  # Conservative limit for tokens
-            
+
             if len(text) > max_chunk_length:
                 # Take first chunk for now (could be improved with sliding window)
                 text = text[:max_chunk_length]

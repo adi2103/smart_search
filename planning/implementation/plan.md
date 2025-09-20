@@ -5,8 +5,8 @@
 - [x] Step 2: Resolve Python import path issues
 - [x] Step 3: Restart and verify API container functionality
 - [x] Step 4: Test all three API endpoints
-- [ ] Step 5: Implement Gemini API abstractive summarization (Phase 2)
-- [ ] Step 6: Implement HuggingFace BART abstractive summarization (Phase 3)
+- [x] Step 5: Implement Gemini API abstractive summarization (Phase 2)
+- [x] Step 6: Implement HuggingFace BART abstractive summarization (Phase 3)
 - [ ] Step 7: Add basic error handling and validation
 - [ ] Step 8: Create integration test for end-to-end workflow
 
@@ -67,38 +67,85 @@ Implementation approach:
 Expected outcome: SUMMARIZER=bart produces high-quality abstractive summaries using self-hosted BART model.
 ```
 
-### Step 7 Prompt: Add basic error handling and validation
+### Step 7 Prompt: Add comprehensive error handling and validation
 
 ```
-Implement proper error handling and input validation for the WealthTech Smart Search API.
+Implement comprehensive error handling and input validation for the WealthTech Smart Search API.
 
-Tasks:
-- Add HTTP error responses for invalid requests (400, 404, 500)
-- Implement client existence validation before document/note creation
-- Add request size limits and content validation
-- Ensure proper error messages with clear descriptions
-- Add database connection error handling
-- Validate required fields in request bodies
-- Add graceful fallback for AI summarization failures
+CRITICAL Requirements (from design document):
+1. Client Validation: "Check client_id exists (and belongs to tenant_id=1 in MVP)"
+   - Add client existence validation in documents.py and notes.py
+   - Return 404 for invalid client_id
+   - Ensure client belongs to tenant_id=1
 
-Expected outcome: API handles invalid requests gracefully with proper HTTP status codes and error messages.
+2. HTTP Error Responses:
+   - 400 for invalid request data (malformed JSON, missing fields)
+   - 404 for non-existent client_id
+   - 500 for database connection failures
+   - 500 for AI service failures (with graceful fallback)
+
+3. Input Validation:
+   - Content length limits (prevent huge documents)
+   - Query parameter validation in search endpoint
+   - Request size limits
+
+4. Database Error Handling:
+   - Wrap database operations in try/catch blocks
+   - Handle SQLAlchemy connection errors
+   - Add proper error logging
+
+5. AI Service Error Handling:
+   - Handle embedding generation failures
+   - Handle summarization failures (already has fallback)
+   - Ensure graceful degradation
+
+Implementation Tasks:
+- Add validate_client_exists() function
+- Wrap all API endpoints with proper error handling
+- Add input validation decorators/middleware
+- Update database.py with connection error handling
+- Add proper logging for debugging
+
+Expected outcome: API handles all error scenarios gracefully with proper HTTP status codes and never crashes.
 ```
 
-### Step 8 Prompt: Create integration test for end-to-end workflow
+### Step 8 Prompt: Create comprehensive integration tests and fix test quality issues
 
 ```
-Create integration test to verify the complete WealthTech Smart Search workflow including all 3 summarization phases.
+Create comprehensive integration tests for the WealthTech Smart Search API and fix existing test quality issues.
 
-Test workflow:
-1. Create/verify test client exists
+Test Quality Issues to Fix:
+1. Mock-Heavy Tests: Current tests mock everything and don't test real functionality
+   - Replace mock-heavy tests with real integration tests
+   - Test actual API endpoints, not just mocked components
+   - Test real AI summarization (at least extractive mode)
+
+2. Missing Test Coverage:
+   - No tests for API endpoints (documents, notes, search)
+   - No tests for error scenarios (404, 500 responses)
+   - No tests for search functionality end-to-end
+   - No tests for hybrid search ranking
+
+3. AI-Generated Test Smells:
+   - Overly verbose docstrings in test files
+   - Unnecessary test comments
+   - Clean up test structure and naming
+
+Integration Test Workflow:
+1. Test client creation and validation
 2. Test all 3 summarization modes (extractive, gemini, bart)
 3. Upload sample documents and notes with each summarization mode
 4. Perform search queries that return results from all modes
 5. Verify search results include proper summaries and RRF ranking
 6. Test different search types (document only, note only, both)
-7. Compare summarization quality across all 3 phases
+7. Test error scenarios (invalid client_id, malformed requests)
+8. Compare summarization quality across all 3 phases
 
-Expected outcome: Complete integration test passes, demonstrating all 3 AI summarization phases work with hybrid search.
+Expected outcome: 
+- Complete integration test suite that tests real functionality
+- All error scenarios covered with proper HTTP status code validation
+- Clean, maintainable test code without AI-generated verbosity
+- Confidence that all 3 AI summarization phases work with hybrid search
 ```
 
 ## Usage Instructions

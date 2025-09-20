@@ -18,11 +18,9 @@ async def create_document(
     embedder = get_embedder(settings.embeddings_provider)
     summarizer = get_summarizer(settings.summarizer)
 
-    # Generate embedding and summary
     embedding = embedder.encode(document.content)
     summary = summarizer.summarize(document.content, content_type="document")
 
-    # Create document
     db_document = Document(
         tenant_id=settings.tenant_id,
         client_id=client_id,
