@@ -22,7 +22,7 @@ def get_db():
     except SQLAlchemyError as e:
         logger.error(f"Database connection failed: {e}")
         raise HTTPException(
-            status_code=500, 
+            status_code=500,
             detail="Database connection failed"
         )
     except Exception as e:

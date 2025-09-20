@@ -22,10 +22,10 @@ async def create_document(
     try:
         # Validate client exists and belongs to tenant
         validate_client_exists(client_id, db)
-        
+
         # Validate content length
         validate_content_length(document.content)
-        
+
         # Get services
         embedder = get_embedder(settings.embeddings_provider)
         summarizer = get_summarizer(settings.summarizer)
@@ -72,7 +72,7 @@ async def create_document(
             summary=db_document.summary,
             created_at=db_document.created_at
         )
-        
+
     except HTTPException:
         # Re-raise HTTP exceptions (validation errors)
         raise

@@ -9,13 +9,13 @@ def validate_client_exists(client_id: int, db: Session) -> Client:
         Client.id == client_id,
         Client.tenant_id == settings.tenant_id
     ).first()
-    
+
     if not client:
         raise HTTPException(
-            status_code=404, 
+            status_code=404,
             detail=f"Client {client_id} not found"
         )
-    
+
     return client
 
 def validate_content_length(content: str, max_length: int = 50000) -> None:
@@ -33,7 +33,7 @@ def validate_search_query(query: str) -> None:
             status_code=400,
             detail="Search query cannot be empty"
         )
-    
+
     if len(query) > 1000:
         raise HTTPException(
             status_code=400,

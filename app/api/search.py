@@ -24,7 +24,7 @@ async def search(
     try:
         # Validate search query
         validate_search_query(q)
-        
+
         # Validate type parameter
         if type and type not in ["document", "note"]:
             raise HTTPException(
@@ -86,7 +86,7 @@ async def search(
                             created_at=doc.created_at,
                             score=score
                         ))
-                        
+
             except SQLAlchemyError as e:
                 logger.error(f"Database error searching documents: {e}")
                 raise HTTPException(
@@ -135,7 +135,7 @@ async def search(
                             created_at=note.created_at,
                             score=score
                         ))
-                        
+
             except SQLAlchemyError as e:
                 logger.error(f"Database error searching notes: {e}")
                 raise HTTPException(
@@ -149,7 +149,7 @@ async def search(
             type=type,
             results=results
         )
-        
+
     except HTTPException:
         # Re-raise HTTP exceptions (validation errors)
         raise

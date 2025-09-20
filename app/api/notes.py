@@ -22,10 +22,10 @@ async def create_note(
     try:
         # Validate client exists and belongs to tenant
         validate_client_exists(client_id, db)
-        
+
         # Validate content length
         validate_content_length(note.content)
-        
+
         # Get services
         embedder = get_embedder(settings.embeddings_provider)
         summarizer = get_summarizer(settings.summarizer)
@@ -70,7 +70,7 @@ async def create_note(
             summary=db_note.summary,
             created_at=db_note.created_at
         )
-        
+
     except HTTPException:
         # Re-raise HTTP exceptions (validation errors)
         raise

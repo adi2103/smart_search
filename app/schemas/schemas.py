@@ -5,13 +5,13 @@ from typing import List, Optional
 class DocumentCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=500, description="Document title")
     content: str = Field(..., min_length=1, max_length=50000, description="Document content")
-    
+
     @validator('title')
     def title_must_not_be_empty(cls, v):
         if not v.strip():
             raise ValueError('Title cannot be empty')
         return v.strip()
-    
+
     @validator('content')
     def content_must_not_be_empty(cls, v):
         if not v.strip():
@@ -28,7 +28,7 @@ class DocumentResponse(BaseModel):
 
 class NoteCreate(BaseModel):
     content: str = Field(..., min_length=1, max_length=50000, description="Note content")
-    
+
     @validator('content')
     def content_must_not_be_empty(cls, v):
         if not v.strip():
