@@ -1,0 +1,38 @@
+name: Update API Documentation
+
+on:
+  push:
+    branches: [ main ]
+    paths: 
+      - 'src/api/**'
+      - 'src/main.py'
+  workflow_dispatch:
+
+jobs:
+  update-docs:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Docker Compose
+      run: |
+        export GEMINI_API_KEY="dummy-key-for-docs"
+        docker compose up -d
+        
+    - name: Wait for API to be ready
+      run: |
+        timeout 60 bash -c 'until curl -s http://localhost:8000/health; do sleep 2; done'
+        
+    - name: Update documentation
+      run: ./scripts/update-docs.sh
+      
+    - name: Commit updated docs
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add docs/
+        git diff --staged --quiet || git commit -m "docs: auto-update API documentation [skip ci]"
+        git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

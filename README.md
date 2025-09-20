@@ -184,6 +184,14 @@ python -m pytest tests/test_unit.py --cov=src --cov-report=term-missing
 - **OpenAPI Schema**: http://localhost:8000/openapi.json
 - **Markdown Docs**: [docs/API.md](docs/API.md) (Static documentation)
 
+### Update Documentation
+```bash
+# Manual update (requires API running)
+./scripts/update-docs.sh
+
+# Or auto-updates via GitHub Actions when API changes
+```
+
 ## 🆘 Troubleshooting
 
 **Database Issues?**
