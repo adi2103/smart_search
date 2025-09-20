@@ -1,14 +1,17 @@
-from abc import ABC, abstractmethod
-from sumy.parsers.plaintext import PlaintextParser
-from sumy.nlp.tokenizers import Tokenizer
-from sumy.summarizers.lex_rank import LexRankSummarizer
 import os
+from abc import ABC, abstractmethod
 from typing import Optional
+
+from sumy.nlp.tokenizers import Tokenizer
+from sumy.parsers.plaintext import PlaintextParser
+from sumy.summarizers.lex_rank import LexRankSummarizer
+
 
 class Summarizer(ABC):
     @abstractmethod
     def summarize(self, text: str, content_type: str = "document") -> str:
         pass
+
 
 class ExtractiveSummarizer(Summarizer):
     def __init__(self, sentence_count: int = 3):
@@ -20,6 +23,7 @@ class ExtractiveSummarizer(Summarizer):
         summary = self.summarizer(parser.document, self.sentence_count)
         return " ".join(str(sentence) for sentence in summary)
 
+
 class GeminiSummarizer(Summarizer):
     def __init__(self, api_key: Optional[str] = None):
         self.api_key = api_key or os.getenv("GEMINI_API_KEY")
@@ -28,9 +32,10 @@ class GeminiSummarizer(Summarizer):
 
         try:
             import google.generativeai as genai
+
             genai.configure(api_key=self.api_key)
             self.genai = genai
-            self.model = genai.GenerativeModel('gemini-1.5-flash')
+            self.model = genai.GenerativeModel("gemini-1.5-flash")
             self.available = True
         except ImportError:
             raise ImportError("google-generativeai library not available. Install with: pip install google-generativeai")
@@ -75,11 +80,7 @@ Advisory Summary:"""
 
         try:
             response = self.model.generate_content(
-                prompt,
-                generation_config=self.genai.GenerationConfig(
-                    temperature=0.3,
-                    max_output_tokens=200
-                )
+                prompt, generation_config=self.genai.GenerationConfig(temperature=0.3, max_output_tokens=200)
             )
 
             if response.text:
@@ -95,6 +96,7 @@ Advisory Summary:"""
             fallback = ExtractiveSummarizer()
             return fallback.summarize(text)
 
+
 class BARTSummarizer(Summarizer):
     _model_cache = None  # Class-level cache for model
 
@@ -103,12 +105,13 @@ class BARTSummarizer(Summarizer):
             # Use cached model if available
             if BARTSummarizer._model_cache is None:
                 from transformers import pipeline
+
                 print("Loading BART model (this may take a few minutes on first run)...")
                 BARTSummarizer._model_cache = pipeline(
                     "summarization",
                     model="facebook/bart-large-cnn",
                     device=-1,  # Use CPU
-                    model_kwargs={"cache_dir": "/tmp/transformers_cache"}
+                    model_kwargs={"cache_dir": "/tmp/transformers_cache"},
                 )
                 print("BART model loaded successfully")
 
@@ -138,15 +141,11 @@ class BARTSummarizer(Summarizer):
             min_length = min(30, max_length // 2)
 
             summary = self.summarizer(
-                text,
-                max_length=max_length,
-                min_length=min_length,
-                do_sample=False,
-                truncation=True
+                text, max_length=max_length, min_length=min_length, do_sample=False, truncation=True
             )
 
             if summary and len(summary) > 0:
-                return summary[0]['summary_text']
+                return summary[0]["summary_text"]
             else:
                 # Fallback to extractive if no response
                 fallback = ExtractiveSummarizer()
@@ -157,6 +156,7 @@ class BARTSummarizer(Summarizer):
             # Fallback to extractive summarization
             fallback = ExtractiveSummarizer()
             return fallback.summarize(text, content_type)
+
 
 def get_summarizer(provider: str = "extractive") -> Summarizer:
     if provider == "extractive":

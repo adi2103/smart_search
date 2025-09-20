@@ -1,14 +1,17 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import SQLAlchemyError
-from fastapi import HTTPException
-from src.config import settings
 import logging
+
+from fastapi import HTTPException
+from sqlalchemy import create_engine
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import sessionmaker
+
+from src.config import settings
 
 logger = logging.getLogger(__name__)
 
 engine = create_engine(settings.database_url)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 
 def get_db():
     """Database dependency with error handling"""
@@ -21,16 +24,10 @@ def get_db():
         raise
     except SQLAlchemyError as e:
         logger.error(f"Database connection failed: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail="Database connection failed"
-        )
+        raise HTTPException(status_code=500, detail="Database connection failed")
     except Exception as e:
         logger.error(f"Unexpected database error: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail="Database error occurred"
-        )
+        raise HTTPException(status_code=500, detail="Database error occurred")
     finally:
         if db:
             try:

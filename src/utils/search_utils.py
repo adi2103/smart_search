@@ -1,9 +1,11 @@
 from typing import List, Tuple
+
 import numpy as np
 
-def reciprocal_rank_fusion(fts_results: List[Tuple[int, float]],
-                          vector_results: List[Tuple[int, float]],
-                          k: int = 60) -> List[Tuple[int, float]]:
+
+def reciprocal_rank_fusion(
+    fts_results: List[Tuple[int, float]], vector_results: List[Tuple[int, float]], k: int = 60
+) -> List[Tuple[int, float]]:
     """Merge FTS and vector search results using RRF."""
     scores = {}
 

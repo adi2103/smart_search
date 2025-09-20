@@ -1,14 +1,16 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
+from pgvector.sqlalchemy import Vector
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
-from pgvector.sqlalchemy import Vector
 
 Base = declarative_base()
+
 
 class Tenant(Base):
     __tablename__ = "tenants"
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
+
 
 class Client(Base):
     __tablename__ = "clients"
@@ -17,6 +19,7 @@ class Client(Base):
     first_name = Column(String)
     last_name = Column(String)
     email = Column(String, unique=True)
+
 
 class Document(Base):
     __tablename__ = "documents"
@@ -28,6 +31,7 @@ class Document(Base):
     summary = Column(Text)
     created_at = Column(DateTime, server_default=func.now())
     content_embedding = Column(Vector(384))
+
 
 class MeetingNote(Base):
     __tablename__ = "meeting_notes"
