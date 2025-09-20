@@ -1,14 +1,55 @@
 # WealthTech Smart Search API
 
+# WealthTech Smart Search API
+
 ## 🚀 Quick Start with Docker
 
-### 1. Set API Key & Run
+### 1. Clone Repository
 ```bash
-# Set your Gemini API key (shared separately for security)
-export GEMINI_API_KEY="your-gemini-api-key-here"
+git clone <repo-url>
+cd project_20250915_2114_smart_search
+```
 
-# Start the application
+### 2. Set API Key (Recommended: .env File)
+```bash
+# Copy template and edit with your actual API key
+cp .env.example .env
+nano .env  # Edit: GEMINI_API_KEY=your-actual-gemini-api-key
+
+# Start application
 docker compose up -d
+```
+
+**Alternative: Environment Variable**
+```bash
+# Set API key directly (temporary)
+export GEMINI_API_KEY="your-gemini-api-key-here"
+docker compose up -d
+```
+
+### 3. Verify Setup
+```bash
+# Check health
+curl http://localhost:8000/health
+# Should return: {"status":"healthy"}
+
+# Access interactive API docs
+open http://localhost:8000/docs
+```
+
+### 4. Optional: Switch AI Methods
+```bash
+# Use BART (local, no API key needed)
+export SUMMARIZER="bart"
+docker compose restart api
+
+# Use extractive (local, no API key needed)  
+export SUMMARIZER="extractive"
+docker compose restart api
+
+# Back to Gemini (default)
+export SUMMARIZER="gemini"
+docker compose restart api
 ```
 
 ### 2. Access the API
