@@ -182,6 +182,7 @@ python -m pytest tests/test_unit.py --cov=src --cov-report=term-missing
 - **Interactive Docs**: http://localhost:8000/docs (Swagger UI)
 - **ReDoc**: http://localhost:8000/redoc (Alternative format)
 - **OpenAPI Schema**: http://localhost:8000/openapi.json
+- **Markdown Docs**: [docs/API.md](docs/API.md) (Static documentation)
 
 ## 🆘 Troubleshooting
 
