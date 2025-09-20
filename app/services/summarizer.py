@@ -96,14 +96,23 @@ Advisory Summary:"""
             return fallback.summarize(text)
 
 class BARTSummarizer(Summarizer):
+    _model_cache = None  # Class-level cache for model
+    
     def __init__(self):
         try:
-            from transformers import pipeline
-            self.summarizer = pipeline(
-                "summarization",
-                model="facebook/bart-large-cnn",
-                device=-1  # Use CPU
-            )
+            # Use cached model if available
+            if BARTSummarizer._model_cache is None:
+                from transformers import pipeline
+                print("Loading BART model (this may take a few minutes on first run)...")
+                BARTSummarizer._model_cache = pipeline(
+                    "summarization",
+                    model="facebook/bart-large-cnn",
+                    device=-1,  # Use CPU
+                    model_kwargs={"cache_dir": "/tmp/transformers_cache"}
+                )
+                print("BART model loaded successfully")
+            
+            self.summarizer = BARTSummarizer._model_cache
             self.available = True
         except ImportError:
             raise ImportError("transformers library not available. Install with: pip install transformers torch")
@@ -116,17 +125,24 @@ class BARTSummarizer(Summarizer):
             raise RuntimeError("BART summarizer not available")
 
         try:
-            # BART works best with 512-1024 tokens, chunk if needed
-            max_chunk_length = 1000
+            # BART has a 1024 token limit, chunk longer texts
+            max_chunk_length = 800  # Conservative limit for tokens
+            
             if len(text) > max_chunk_length:
+                # Take first chunk for now (could be improved with sliding window)
                 text = text[:max_chunk_length]
 
-            # Generate summary
+            # Generate summary with appropriate length based on input
+            input_length = len(text)
+            max_length = min(150, max(50, input_length // 4))  # 25% of input, capped
+            min_length = min(30, max_length // 2)
+
             summary = self.summarizer(
                 text,
-                max_length=150,
-                min_length=50,
-                do_sample=False
+                max_length=max_length,
+                min_length=min_length,
+                do_sample=False,
+                truncation=True
             )
 
             if summary and len(summary) > 0:
@@ -134,13 +150,13 @@ class BARTSummarizer(Summarizer):
             else:
                 # Fallback to extractive if no response
                 fallback = ExtractiveSummarizer()
-                return fallback.summarize(text)
+                return fallback.summarize(text, content_type)
 
         except Exception as e:
             print(f"BART summarization failed: {e}")
             # Fallback to extractive summarization
             fallback = ExtractiveSummarizer()
-            return fallback.summarize(text)
+            return fallback.summarize(text, content_type)
 
 def get_summarizer(provider: str = "extractive") -> Summarizer:
     if provider == "extractive":

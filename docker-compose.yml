@@ -15,6 +15,7 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
+      - transformers_cache:/tmp/transformers_cache
 
   db:
     image: pgvector/pgvector:pg16
@@ -30,3 +31,4 @@ services:
 
 volumes:
   pg_data:
+  transformers_cache:
