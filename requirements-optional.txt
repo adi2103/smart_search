@@ -1,0 +1,9 @@
+# Optional AI Dependencies for Phase 2 & 3 Summarization
+# Install only if you need Gemini API or BART local summarization
+
+# Phase 2: Gemini API Summarization
+google-generativeai>=0.3.0
+
+# Phase 3: BART Local Summarization  
+transformers>=4.30.0
+torch>=2.0.0

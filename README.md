@@ -77,6 +77,37 @@ See `WealthTech_Smart_Search_Design.md` for complete architecture details, API s
 **Last Updated**: 2025-09-16T21:58:43+01:00
 
 
+## Installation
+
+### Core Dependencies (Required)
+```bash
+# Install core API functionality
+pip install -r requirements.txt
+```
+
+### Optional AI Dependencies
+```bash
+# Install Phase 2 & 3 AI summarization (optional)
+pip install -r requirements-optional.txt
+
+# Or install specific phases:
+# Phase 2: Gemini API summarization
+pip install google-generativeai>=0.3.0
+
+# Phase 3: BART local summarization
+pip install transformers>=4.30.0 torch>=2.0.0
+```
+
+### Environment Variables
+```bash
+# Optional: For Gemini API summarization
+export GEMINI_API_KEY="your-api-key"
+
+# Set summarization mode (default: extractive)
+export SUMMARIZER="extractive"  # or "gemini" or "bart"
+```
+
+
 ## Testing
 
 ### Test Structure
@@ -106,4 +137,3 @@ python -m pytest tests/test_unit.py --cov=app --cov-report=term-missing
 - **Unit Tests**: Core business logic, edge cases, regression prevention
 - **Integration Tests**: Complete API functionality via HTTP requests
 - **Combined**: Comprehensive system validation
-

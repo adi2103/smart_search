@@ -1,14 +1,23 @@
-fastapi
-uvicorn[standard]
-pydantic
-pydantic-settings
-sqlalchemy
-psycopg2-binary
-pgvector
-sentence-transformers
-sumy
-httpx
-# AI Summarization Phase 2 & 3
-google-generativeai
-transformers
-torch
+# Core API Framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+# Database
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.0
+pgvector>=0.2.0
+
+# Core AI - Always Required
+sentence-transformers>=2.2.0
+sumy>=0.11.0
+numpy>=1.24.0
+
+# Optional AI - Phase 2 & 3 (install only if needed)
+# google-generativeai>=0.3.0  # For Gemini API summarization
+# transformers>=4.30.0        # For BART local summarization  
+# torch>=2.0.0                # Required by transformers
+
+# Development/Testing
+httpx>=0.25.0  # For testing HTTP requests
