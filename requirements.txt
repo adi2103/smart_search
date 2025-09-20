@@ -14,10 +14,12 @@ sentence-transformers>=2.2.0
 sumy>=0.11.0
 numpy>=1.24.0
 
-# Optional AI - Phase 2 & 3 (install only if needed)
-# google-generativeai>=0.3.0  # For Gemini API summarization
-# transformers>=4.30.0        # For BART local summarization  
-# torch>=2.0.0                # Required by transformers
+# Default AI - Gemini API Summarization
+google-generativeai>=0.3.0
 
 # Development/Testing
-httpx>=0.25.0  # For testing HTTP requests
+httpx>=0.25.0
+
+# Optional AI - Phase 3 (install only if needed)
+# transformers>=4.30.0        # For BART local summarization  
+# torch>=2.0.0                # Required by transformers

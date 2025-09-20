@@ -192,4 +192,4 @@ class TestConfiguration:
         """Test default configuration values"""
         assert settings.tenant_id == 1
         assert settings.embeddings_provider == "local"
-        assert settings.summarizer in ["extractive", "gemini", "bart"]
+        assert settings.summarizer == "gemini"

@@ -81,30 +81,26 @@ See `WealthTech_Smart_Search_Design.md` for complete architecture details, API s
 
 ### Core Dependencies (Required)
 ```bash
-# Install core API functionality
+# Install core API functionality with Gemini AI summarization
 pip install -r requirements.txt
 ```
 
 ### Optional AI Dependencies
 ```bash
-# Install Phase 2 & 3 AI summarization (optional)
+# Install Phase 3 BART local summarization (optional)
 pip install -r requirements-optional.txt
 
-# Or install specific phases:
-# Phase 2: Gemini API summarization
-pip install google-generativeai>=0.3.0
-
-# Phase 3: BART local summarization
+# Or install directly:
 pip install transformers>=4.30.0 torch>=2.0.0
 ```
 
 ### Environment Variables
 ```bash
-# Optional: For Gemini API summarization
+# Required: Gemini API key for default summarization
 export GEMINI_API_KEY="your-api-key"
 
-# Set summarization mode (default: extractive)
-export SUMMARIZER="extractive"  # or "gemini" or "bart"
+# Optional: Override summarization mode (default: gemini)
+export SUMMARIZER="gemini"  # or "extractive" or "bart"
 ```
 
 
