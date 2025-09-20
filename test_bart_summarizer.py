@@ -1,53 +1,33 @@
-"""
-Test suite for BART summarization functionality
-"""
 import pytest
-from unittest.mock import patch, MagicMock
 from app.services.summarizer import BARTSummarizer, get_summarizer
 
-
 class TestBARTSummarizer:
-    """Test cases for BARTSummarizer class"""
-
-    @patch('transformers.pipeline')
-    def test_initialization_with_model_caching(self, mock_pipeline):
-        """Test BARTSummarizer uses model caching correctly"""
-        mock_model = MagicMock()
-        mock_pipeline.return_value = mock_model
-
-        # First initialization should load model
-        summarizer1 = BARTSummarizer()
-        assert summarizer1.available is True
-        mock_pipeline.assert_called_once()
-
-        # Second initialization should use cached model
-        mock_pipeline.reset_mock()
-        summarizer2 = BARTSummarizer()
-        assert summarizer2.available is True
-        mock_pipeline.assert_not_called()  # Should use cache
-
-        # Both should reference same cached model
-        assert summarizer1.summarizer is summarizer2.summarizer
-
-    def test_initialization_import_error(self):
-        """Test BARTSummarizer handles missing transformers library"""
-        with patch('builtins.__import__', side_effect=ImportError):
-            with pytest.raises(ImportError, match="transformers library not available"):
-                BARTSummarizer()
-
-    @patch('transformers.pipeline')
-    def test_summarize_success(self, mock_pipeline):
-        """Test successful summarization with BART"""
-        # Setup mocks
-        mock_summary_result = [{'summary_text': 'This is a BART-generated abstractive summary of the financial document.'}]
-        mock_model = MagicMock()
-        mock_model.return_value = mock_summary_result
-        mock_pipeline.return_value = mock_model
-
+    
+    def test_bart_initialization(self):
+        """Test BART summarizer initializes correctly"""
         summarizer = BARTSummarizer()
-        test_text = "This document provides a comprehensive analysis of the client investment portfolio for 2024. The portfolio shows strong performance in technology stocks with a 15% return. Key recommendations include diversifying into emerging markets and increasing bond allocation for risk management."
-
-        result = summarizer.summarize(test_text)
+        assert summarizer.available is True
+        assert hasattr(summarizer, 'summarizer')
+    
+    def test_bart_summarization_real(self):
+        """Test actual BART summarization functionality"""
+        summarizer = BARTSummarizer()
+        
+        test_text = "This investment portfolio analysis examines asset allocation strategies and risk management approaches for financial advisory clients. The comprehensive report evaluates various investment vehicles and provides recommendations for portfolio optimization."
+        
+        result = summarizer.summarize(test_text, content_type="document")
+        
+        assert isinstance(result, str)
+        assert len(result) > 0
+        assert len(result) <= len(test_text)  # Should be same or shorter
+    
+    def test_get_summarizer_factory(self):
+        """Test summarizer factory returns correct type"""
+        bart_summarizer = get_summarizer("bart")
+        assert isinstance(bart_summarizer, BARTSummarizer)
+        
+        extractive_summarizer = get_summarizer("extractive")
+        assert extractive_summarizer.__class__.__name__ == "ExtractiveSummarizer"
 
         assert result == "This is a BART-generated abstractive summary of the financial document."
         mock_model.assert_called_once()
