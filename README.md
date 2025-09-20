@@ -75,3 +75,35 @@ See `WealthTech_Smart_Search_Design.md` for complete architecture details, API s
 ---
 **Estimated Time to Complete**: 2-3 hours remaining for fully functional MVP
 **Last Updated**: 2025-09-16T21:58:43+01:00
+
+
+## Testing
+
+### Test Structure
+- `tests/test_unit.py` - Unit tests for core business logic and regression prevention
+- `tests/test_integration.py` - Integration tests for complete API functionality
+
+### Running Tests
+
+```bash
+# Install test dependencies
+pip install -r tests/requirements.txt
+
+# Run unit tests (fast, ~14s)
+python -m pytest tests/test_unit.py -v
+
+# Run integration tests (requires API running, ~90s)
+python -m pytest tests/test_integration.py -v
+
+# Run all tests
+python -m pytest tests/ -v
+
+# Run with coverage
+python -m pytest tests/test_unit.py --cov=app --cov-report=term-missing
+```
+
+### Test Coverage
+- **Unit Tests**: Core business logic, edge cases, regression prevention
+- **Integration Tests**: Complete API functionality via HTTP requests
+- **Combined**: Comprehensive system validation
+

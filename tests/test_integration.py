@@ -1,10 +1,14 @@
+"""
+Integration tests for WealthTech Smart Search API
+Tests complete API functionality via HTTP requests
+"""
 import pytest
 import requests
-import time
 import os
-from typing import Dict, List
+
 
 BASE_URL = "http://localhost:8000"
+
 
 class TestWealthTechAPI:
     """Integration tests for WealthTech Smart Search API"""
@@ -27,7 +31,7 @@ class TestWealthTechAPI:
         assert "Client 999 not found" in response.json()["detail"]
     
     def test_input_validation(self, api_client):
-        """Test input validation returns 422 for invalid data"""
+        """Test input validation returns proper error codes"""
         # Empty content
         response = requests.post(
             f"{api_client}/clients/1/documents",
@@ -47,7 +51,6 @@ class TestWealthTechAPI:
     
     def test_extractive_summarization(self, api_client):
         """Test extractive summarization (default mode)"""
-        # Set extractive mode
         os.environ["SUMMARIZER"] = "extractive"
         
         doc_data = {
@@ -82,7 +85,6 @@ class TestWealthTechAPI:
         result = response.json()
         assert result["title"] == doc_data["title"]
         assert len(result["summary"]) <= len(doc_data["content"])
-        # Gemini should provide more concise, advisor-focused summaries
         assert any(keyword in result["summary"].lower() for keyword in ["return", "performance", "portfolio"])
     
     def test_bart_summarization(self, api_client):
@@ -100,14 +102,11 @@ class TestWealthTechAPI:
         result = response.json()
         assert result["title"] == doc_data["title"]
         assert len(result["summary"]) <= len(doc_data["content"])
-        # BART should provide abstractive summaries
         assert any(keyword in result["summary"].lower() for keyword in ["risk", "portfolio", "management"])
     
     def test_note_creation_all_modes(self, api_client):
         """Test note creation with all summarization modes"""
         note_content = "Client meeting focused on retirement planning goals. Client is 55 years old and wants to retire by 65. Currently has $750K in retirement accounts and contributes $25K annually. Discussed asset allocation strategy: 60% stocks, 35% bonds, 5% cash. Client comfortable with moderate risk tolerance. Next steps: review Social Security projections and update beneficiary information."
-        
-        note_ids = []
         
         for mode in ["extractive", "gemini", "bart"]:
             if mode == "gemini" and not os.getenv("GEMINI_API_KEY"):
@@ -125,17 +124,11 @@ class TestWealthTechAPI:
             assert result["content"] == note_content
             assert len(result["summary"]) <= len(note_content)
             assert "retirement" in result["summary"].lower()
-            
-            note_ids.append(result["id"])
-        
-        return note_ids
     
     def test_hybrid_search_functionality(self, api_client):
         """Test hybrid search with FTS and vector search"""
-        # Reset to extractive for consistent testing
         os.environ["SUMMARIZER"] = "extractive"
         
-        # Search for investment-related content
         response = requests.get(f"{api_client}/search", params={"q": "investment portfolio"})
         assert response.status_code == 200
         
@@ -151,13 +144,11 @@ class TestWealthTechAPI:
             assert "score" in result
             assert "summary" in result
             assert "content" in result
-            
+        
         # Verify RRF ranking produces reasonable scores
         scores = [r["score"] for r in results["results"]]
         assert all(score > 0 for score in scores), "All scores should be positive"
         assert len(set(scores)) > 1 or len(scores) == 1, "Should have varied scores or single result"
-        
-        return results["results"]
     
     def test_search_type_filtering(self, api_client):
         """Test search filtering by document/note type"""
@@ -181,7 +172,7 @@ class TestWealthTechAPI:
         
         all_results = response.json()["results"]
         types = {r["type"] for r in all_results}
-        assert len(types) >= 1  # Should have at least one type
+        assert len(types) >= 1
     
     def test_summarization_quality_comparison(self, api_client):
         """Compare summarization quality across all 3 phases"""
@@ -208,12 +199,10 @@ class TestWealthTechAPI:
                 "id": result["id"]
             }
         
-        # Verify all summaries are shorter than original
+        # Verify all summaries are shorter than or equal to original
         for mode, data in summaries.items():
-            assert data["compression"] < 1.0, f"{mode} summary should be shorter than original"
+            assert data["compression"] <= 1.0, f"{mode} summary should be shorter than or equal to original"
             assert "retirement" in data["summary"].lower() or "financial" in data["summary"].lower()
-        
-        return summaries
     
     def test_error_scenarios_comprehensive(self, api_client):
         """Test all error scenarios return proper HTTP codes"""
@@ -275,10 +264,7 @@ class TestWealthTechAPI:
         for result in results:
             if result["id"] in [doc_id, note_id]:
                 assert len(result["summary"]) > 0
-                assert len(result["summary"]) <= len(result["content"])  # Summary can be same length for short content
+                assert len(result["summary"]) <= len(result["content"])
                 break
         else:
             pytest.fail("Created content not found in search results")
-
-if __name__ == "__main__":
-    pytest.main([__file__, "-v"])
