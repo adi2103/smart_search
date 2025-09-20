@@ -1,6 +1,0 @@
-# Optional AI Dependencies for Phase 3 Summarization
-# Install only if you need BART local summarization
-
-# Phase 3: BART Local Summarization  
-transformers>=4.30.0
-torch>=2.0.0

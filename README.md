@@ -79,28 +79,45 @@ See `WealthTech_Smart_Search_Design.md` for complete architecture details, API s
 
 ## Installation
 
-### Core Dependencies (Required)
+### Simple Setup
 ```bash
-# Install core API functionality with Gemini AI summarization
+# Install all dependencies (includes all AI methods)
 pip install -r requirements.txt
-```
 
-### Optional AI Dependencies
-```bash
-# Install Phase 3 BART local summarization (optional)
-pip install -r requirements-optional.txt
-
-# Or install directly:
-pip install transformers>=4.30.0 torch>=2.0.0
-```
-
-### Environment Variables
-```bash
-# Required: Gemini API key for default summarization
+# Set your Gemini API key
 export GEMINI_API_KEY="your-api-key"
 
-# Optional: Override summarization mode (default: gemini)
+# Optional: Choose summarization method (default: gemini)
 export SUMMARIZER="gemini"  # or "extractive" or "bart"
+```
+
+## Docker Deployment
+
+### Quick Start
+```bash
+# Copy environment template
+cp .env.example .env
+
+# Edit .env and add your GEMINI_API_KEY
+nano .env
+
+# Start the application (all AI methods included)
+docker compose up -d
+```
+
+### Switch AI Methods
+```bash
+# Use Gemini (default - requires API key)
+echo "SUMMARIZER=gemini" >> .env
+
+# Use BART (local, no API key needed)
+echo "SUMMARIZER=bart" >> .env
+
+# Use extractive (local, no API key needed)
+echo "SUMMARIZER=extractive" >> .env
+
+# Restart to apply changes
+docker compose restart api
 ```
 
 
