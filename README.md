@@ -169,56 +169,49 @@ curl -X POST "http://localhost:8000/clients/1/notes" \
 
 ### Search Examples
 
-**Search Across All Content (Documents + Notes)**
+**Unified Hybrid Search (Documents + Notes)**
 ```bash
-# Hybrid search across both documents and notes
-curl "http://localhost:8000/search?q=retirement%20planning"
+# Search across all content - demonstrates D-D-D-N-N-N-D-N-N pattern
+curl "http://localhost:8000/search?q=portfolio"
 ```
 
-**Search Only Documents**
+**Documents Only**
 ```bash
-# Find investment-related documents
-curl "http://localhost:8000/search?q=portfolio%20performance&type=document"
+# Same query, documents filtered - consistent document ordering
+curl "http://localhost:8000/search?q=portfolio&type=document"
 ```
 
-**Search Only Notes**
+**Notes Only**
 ```bash
-# Find client meeting discussions
-curl "http://localhost:8000/search?q=401k%20contribution&type=note"
+# Same query, notes filtered - consistent note ordering  
+curl "http://localhost:8000/search?q=portfolio&type=note"
 ```
 
-**Complex Search Queries**
-```bash
-# Semantic search for financial concepts
-curl "http://localhost:8000/search?q=asset%20allocation%20strategy"
+### Response Comparison
 
-# Keyword search for specific terms
-curl "http://localhost:8000/search?q=Roth%20conversion"
-```
-
-### Response Format
+**Mixed Search Results (D-D-D-N-N-N-D-N-N Pattern):**
 ```json
 {
-  "query": "retirement planning",
+  "query": "portfolio",
   "results": [
-    {
-      "id": 2,
-      "type": "note",
-      "title": null,
-      "summary": "Client consultation on retirement planning for Sarah, age 52, targeting retirement at 62 with current 401k balance of $485K.",
-      "content": "Client consultation on retirement planning. Sarah, age 52...",
-      "score": 0.92
-    },
-    {
-      "id": 1,
-      "type": "document",
-      "title": "Q3 Portfolio Performance Report",
-      "summary": "Portfolio achieved 12.5% return this quarter, outperforming S&P 500, with recommendations for rebalancing.",
-      "content": "The client portfolio achieved a 12.5% return...",
-      "score": 0.78
-    }
+    {"id": 60, "type": "document", "title": "Asset Allocation Framework", "score": 0.033},
+    {"id": 57, "type": "document", "title": "Investment Strategy Guide", "score": 0.032},
+    {"id": 58, "type": "document", "title": "Portfolio Analysis Report", "score": 0.032},
+    {"id": 39, "type": "note", "summary": "Portfolio review meeting focused on portfolio performance analysis...", "score": 0.031},
+    {"id": 40, "type": "note", "summary": "Portfolio review meeting focused on portfolio performance analysis...", "score": 0.031},
+    {"id": 38, "type": "note", "summary": "Brief check-in call about financial situation including investment portfolio...", "score": 0.030},
+    {"id": 59, "type": "document", "title": "Financial Planning Basics", "score": 0.016},
+    {"id": 36, "type": "note", "summary": "Investment review meeting with client. Discussed investment performance...", "score": 0.015},
+    {"id": 37, "type": "note", "summary": "Client consultation about investment options. Reviewed investment timeline...", "score": 0.014}
   ]
 }
+```
+
+**Key Features:**
+- **Unified Ranking**: Documents and notes intermixed by relevance score
+- **Natural Transitions**: Content type doesn't determine position - only relevance does
+- **Consistent Ordering**: Document order (60→57→58→59) and note order (39→40→38→36→37) maintained across search modes
+- **Hybrid Scores**: RRF algorithm combines FTS + vector similarity for optimal relevance
 ```
 
 **Search Features:**
