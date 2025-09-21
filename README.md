@@ -146,33 +146,86 @@ src/
 - `GET /search?q=query&type=document|note` - Hybrid search with RRF ranking
 - `GET /health` - Health check endpoint
 
-### Examples
+### Upload Examples
+
+**Upload Investment Document**
 ```bash
-# Upload document
 curl -X POST "http://localhost:8000/clients/1/documents" \
   -H "Content-Type: application/json" \
-  -d '{"title": "Investment Analysis", "content": "Portfolio diversification strategies..."}'
+  -d '{
+    "title": "Q3 Portfolio Performance Report",
+    "content": "The client portfolio achieved a 12.5% return this quarter, outperforming the S&P 500 by 2.3%. Asset allocation remains at 70% equities, 25% bonds, 5% cash. Key holdings include technology sector ETFs and dividend-focused mutual funds. Recommend rebalancing to reduce concentration risk in growth stocks."
+  }'
+```
 
-# Search with type filtering
-curl "http://localhost:8000/search?q=portfolio%20diversification&type=document"
+**Upload Meeting Note**
+```bash
+curl -X POST "http://localhost:8000/clients/1/notes" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "Client consultation on retirement planning. Sarah, age 52, wants to retire at 62. Current 401k balance: $485K. Contributing $22K annually. Discussed Roth conversion strategy and healthcare cost planning. Action items: review Social Security projections, increase emergency fund to 6 months expenses."
+  }'
+```
+
+### Search Examples
+
+**Search Across All Content (Documents + Notes)**
+```bash
+# Hybrid search across both documents and notes
+curl "http://localhost:8000/search?q=retirement%20planning"
+```
+
+**Search Only Documents**
+```bash
+# Find investment-related documents
+curl "http://localhost:8000/search?q=portfolio%20performance&type=document"
+```
+
+**Search Only Notes**
+```bash
+# Find client meeting discussions
+curl "http://localhost:8000/search?q=401k%20contribution&type=note"
+```
+
+**Complex Search Queries**
+```bash
+# Semantic search for financial concepts
+curl "http://localhost:8000/search?q=asset%20allocation%20strategy"
+
+# Keyword search for specific terms
+curl "http://localhost:8000/search?q=Roth%20conversion"
 ```
 
 ### Response Format
 ```json
 {
-  "query": "portfolio diversification",
+  "query": "retirement planning",
   "results": [
     {
+      "id": 2,
+      "type": "note",
+      "title": null,
+      "summary": "Client consultation on retirement planning for Sarah, age 52, targeting retirement at 62 with current 401k balance of $485K.",
+      "content": "Client consultation on retirement planning. Sarah, age 52...",
+      "score": 0.92
+    },
+    {
       "id": 1,
-      "type": "document", 
-      "title": "Investment Analysis",
-      "summary": "AI-generated summary focusing on key financial insights...",
-      "content": "Full document content...",
-      "score": 0.85
+      "type": "document",
+      "title": "Q3 Portfolio Performance Report",
+      "summary": "Portfolio achieved 12.5% return this quarter, outperforming S&P 500, with recommendations for rebalancing.",
+      "content": "The client portfolio achieved a 12.5% return...",
+      "score": 0.78
     }
   ]
 }
 ```
+
+**Search Features:**
+- **Ranking**: Results ranked by relevance score (0.0-1.0)
+- **Mixed Results**: Documents and notes can appear together when `type` not specified
+- **Summaries**: AI-generated summaries for quick scanning
+- **Full Content**: Complete original text available for detailed review
 
 ## 🧪 Testing
 
