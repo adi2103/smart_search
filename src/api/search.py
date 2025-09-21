@@ -41,7 +41,8 @@ async def search(
             logger.error(f"Embedding generation failed for search: {e}")
             raise HTTPException(status_code=500, detail="Failed to process search query")
 
-        results = []
+        all_fts_results = []
+        all_vector_results = []
 
         # Search documents
         if not type or type == "document":
@@ -66,29 +67,9 @@ async def search(
                     .all()
                 )
 
-                # Merge with RRF
-                fts_list = [(r.id, r.score) for r in fts_results]
-                vector_list = [(r.id, 1 - r.distance) for r in vector_results]
-                merged = reciprocal_rank_fusion(fts_list, vector_list)
-
-                # Get top documents
-                doc_ids = [doc_id for doc_id, _ in merged[:10]]
-                if doc_ids:
-                    docs = db.query(Document).filter(Document.id.in_(doc_ids)).all()
-                    for doc in docs:
-                        score = next(score for doc_id, score in merged if doc_id == doc.id)
-                        results.append(
-                            SearchResult(
-                                id=doc.id,
-                                type="document",
-                                client_id=doc.client_id,
-                                title=doc.title,
-                                content=doc.content,
-                                summary=doc.summary,
-                                created_at=doc.created_at,
-                                score=score,
-                            )
-                        )
+                # Add to unified results with type prefix
+                all_fts_results.extend([("doc_" + str(r.id), r.score) for r in fts_results])
+                all_vector_results.extend([("doc_" + str(r.id), 1 - r.distance) for r in vector_results])
 
             except SQLAlchemyError as e:
                 logger.error(f"Database error searching documents: {e}")
@@ -119,35 +100,53 @@ async def search(
                     .all()
                 )
 
-                # Merge with RRF
-                fts_list = [(r.id, r.score) for r in fts_results]
-                vector_list = [(r.id, 1 - r.distance) for r in vector_results]
-                merged = reciprocal_rank_fusion(fts_list, vector_list)
-
-                # Get top notes
-                note_ids = [note_id for note_id, _ in merged[:10]]
-                if note_ids:
-                    notes = db.query(MeetingNote).filter(MeetingNote.id.in_(note_ids)).all()
-                    for note in notes:
-                        score = next(score for note_id, score in merged if note_id == note.id)
-                        results.append(
-                            SearchResult(
-                                id=note.id,
-                                type="note",
-                                client_id=note.client_id,
-                                title=None,
-                                content=note.content,
-                                summary=note.summary,
-                                created_at=note.created_at,
-                                score=score,
-                            )
-                        )
+                # Add to unified results with type prefix
+                all_fts_results.extend([("note_" + str(r.id), r.score) for r in fts_results])
+                all_vector_results.extend([("note_" + str(r.id), 1 - r.distance) for r in vector_results])
 
             except SQLAlchemyError as e:
                 logger.error(f"Database error searching notes: {e}")
                 raise HTTPException(status_code=500, detail="Error searching notes")
 
-        # Results are already in RRF-optimized order, no additional sorting needed
+        # Unified RRF ranking across all results
+        merged = reciprocal_rank_fusion(all_fts_results, all_vector_results)
+
+        # Get top results and fetch from database
+        results = []
+        for item_id, score in merged[:20]:  # Top 20 results
+            if item_id.startswith("doc_"):
+                doc_id = int(item_id[4:])  # Remove "doc_" prefix
+                doc = db.query(Document).filter(Document.id == doc_id).first()
+                if doc:
+                    results.append(
+                        SearchResult(
+                            id=doc.id,
+                            type="document",
+                            client_id=doc.client_id,
+                            title=doc.title,
+                            content=doc.content,
+                            summary=doc.summary,
+                            created_at=doc.created_at,
+                            score=score,
+                        )
+                    )
+            elif item_id.startswith("note_"):
+                note_id = int(item_id[5:])  # Remove "note_" prefix
+                note = db.query(MeetingNote).filter(MeetingNote.id == note_id).first()
+                if note:
+                    results.append(
+                        SearchResult(
+                            id=note.id,
+                            type="note",
+                            client_id=note.client_id,
+                            title=None,
+                            content=note.content,
+                            summary=note.summary,
+                            created_at=note.created_at,
+                            score=score,
+                        )
+                    )
+
         return SearchResponse(query=q, type=type, results=results)
 
     except HTTPException:
