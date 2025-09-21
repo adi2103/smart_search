@@ -1,5 +1,34 @@
 # WealthTech Smart Search API
 
+- [WealthTech Smart Search API](#wealthtech-smart-search-api)
+  - [🔍 Key Features](#-key-features)
+  - [🚀 Quick Start](#-quick-start)
+    - [1. Clone \& Setup](#1-clone--setup)
+    - [2. Verify Setup](#2-verify-setup)
+  - [🤖 Summarization Techniques](#-summarization-techniques)
+    - [Gemini API (Default)](#gemini-api-default)
+    - [BART Transformer](#bart-transformer)
+    - [Extractive](#extractive)
+  - [🏗️ Architecture](#️-architecture)
+    - [Design Trade-offs](#design-trade-offs)
+  - [📁 Code Structure](#-code-structure)
+  - [📡 API Usage](#-api-usage)
+    - [Endpoints](#endpoints)
+    - [Upload Examples](#upload-examples)
+    - [Search Examples](#search-examples)
+    - [Response Comparison](#response-comparison)
+    - [Semantic Search Example](#semantic-search-example)
+    - [Test Coverage](#test-coverage)
+    - [Running Tests](#running-tests)
+    - [Test Data](#test-data)
+  - [📚 Documentation](#-documentation)
+    - [Auto-Update Documentation](#auto-update-documentation)
+  - [🆘 Troubleshooting](#-troubleshooting)
+    - [Common Issues](#common-issues)
+
+---
+
+
 A hybrid search system for financial advisors to search client documents and meeting notes using both keyword and semantic search, with AI-powered summarization.
 
 ## 🔍 Key Features
@@ -259,14 +288,50 @@ curl "http://localhost:8000/search?q=equity"
 
 ## 🧪 Testing
 
+### Quick Testing with Realistic Data
+
+**Load test data and try hybrid search:**
+```bash
+# Load realistic financial documents and notes (replace 4 with any test tenant ID)
+cd tests
+TENANT_ID=4 bash run_e2e_tests.sh 4
+
+# Test hybrid search examples
+curl "http://localhost:8000/search?q=7.2%25%20return"        # Find portfolio performance
+curl "http://localhost:8000/search?q=Thompson%20Family"      # Find client meeting
+curl "http://localhost:8000/search?q=portfolio%20diversification"  # Semantic search
+```
+
+**Run API for specific tenant:**
+```bash
+# Start API with specific tenant ID (replace 3 with desired tenant)
+TENANT_ID=3 docker compose up -d
+
+# Or restart existing API with new tenant
+docker compose stop api
+TENANT_ID=3 docker compose up -d api
+```
+
+**Clean database before repeated testing:**
+```bash
+# Clean all test data to avoid duplicates
+cd tests
+bash clear_db.sh
+
+# Or clean specific tenant (recommended for testing)
+bash clear_db.sh 2
+```
+
 ### Test Coverage
 - **Unit Tests (17)**: Core business logic, edge cases, error handling
 - **Integration Tests (11)**: End-to-end API functionality, all summarization methods
-- **Total Coverage**: 28 tests covering search algorithms, AI integration, API contracts
+- **Load Testing**: Realistic financial documents and meeting notes with multi-tenant support
+- **Total Coverage**: 28+ tests covering search algorithms, AI integration, API contracts
 
 ### Running Tests
 ```bash
-# All tests (requires running API)
+# All tests (requires running API with default tenant)
+TENANT_ID=1 docker compose up -d
 docker compose exec api python -m pytest tests/ -v
 
 # Unit tests only (~10s)
@@ -274,14 +339,17 @@ docker compose exec api python -m pytest tests/test_unit.py -v
 
 # Integration tests (~25s)
 docker compose exec api python -m pytest tests/test_integration.py -v
+
+# End-to-end testing with realistic data
+cd tests
+TENANT_ID=4 bash run_e2e_tests.sh 4
 ```
 
 ### Test Data
-Integration tests use realistic financial content:
-- Investment portfolio analyses
-- Client meeting notes on retirement planning
-- Risk assessment documents
-- Asset allocation strategies
+- **Realistic Content**: Portfolio reports, bank statements, tax filings, client meetings
+- **Hybrid Search Examples**: Exact matches, semantic search, cross-content discovery
+- **AI Summarization**: Gemini API generating coherent summaries
+- **Multi-Tenant**: Test with different tenant IDs to isolate data
 
 ## 📚 Documentation
 

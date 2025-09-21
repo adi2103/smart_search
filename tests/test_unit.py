@@ -188,8 +188,18 @@ class TestEmbedderService:
 class TestConfiguration:
     """Test configuration settings"""
 
+    @patch.dict(os.environ, {"TENANT_ID": "1"}, clear=False)
     def test_settings_defaults(self):
         """Test default configuration values"""
-        assert settings.tenant_id == 1
-        assert settings.embeddings_provider == "local"
-        assert settings.summarizer == "gemini"
+        # Clear SUMMARIZER to test default
+        if "SUMMARIZER" in os.environ:
+            del os.environ["SUMMARIZER"]
+            
+        # Reload settings with mocked environment
+        from importlib import reload
+        from src import config
+        reload(config)
+
+        assert config.settings.tenant_id == 1
+        assert config.settings.embeddings_provider == "local"
+        assert config.settings.summarizer == "gemini"

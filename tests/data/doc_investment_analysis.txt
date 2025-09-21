@@ -1,0 +1,36 @@
+Equity Investment Analysis Report
+Date: October 2024
+
+Stock Market Overview:
+Current market conditions show mixed signals with technology stocks leading gains while defensive sectors lag. The S&P 500 has gained 8.2% year-to-date despite recent volatility.
+
+Individual Stock Analysis:
+
+Apple Inc. (AAPL):
+- Current Price: $175.50
+- 52-Week Range: $164.08 - $199.62
+- P/E Ratio: 28.5
+- Dividend Yield: 0.52%
+- Recommendation: HOLD
+
+Microsoft Corp. (MSFT):
+- Current Price: $338.25
+- 52-Week Range: $309.45 - $384.30
+- P/E Ratio: 32.1
+- Dividend Yield: 0.89%
+- Recommendation: BUY
+
+Tesla Inc. (TSLA):
+- Current Price: $248.75
+- 52-Week Range: $138.80 - $299.29
+- P/E Ratio: 65.2
+- Dividend Yield: 0.00%
+- Recommendation: SELL
+
+Sector Allocation Recommendations:
+- Technology: 25% (Reduce from 35%)
+- Healthcare: 15% (Maintain)
+- Financial Services: 12% (Increase from 8%)
+- Consumer Staples: 10% (Increase from 5%)
+- Energy: 8% (New allocation)
+- Other: 30%

@@ -40,3 +40,13 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# Coverage reports
+coverage.xml
+.coverage
+htmlcov/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/

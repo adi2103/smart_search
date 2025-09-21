@@ -34,7 +34,7 @@ class TestWealthTechAPI:
         """Test input validation returns proper error codes"""
         # Empty content
         response = requests.post(
-            f"{api_client}/clients/1/documents",
+            f"{api_client}/clients/2/documents",
             json={"title": "Test", "content": ""}
         )
         assert response.status_code == 422
@@ -58,7 +58,7 @@ class TestWealthTechAPI:
             "content": "This is a comprehensive financial analysis document. It examines investment strategies and portfolio management. The document provides detailed recommendations for asset allocation. Risk management is a key component of the analysis. The report concludes with actionable insights for financial advisors."
         }
 
-        response = requests.post(f"{api_client}/clients/1/documents", json=doc_data)
+        response = requests.post(f"{api_client}/clients/2/documents", json=doc_data)
         assert response.status_code == 201
 
         result = response.json()
@@ -79,7 +79,7 @@ class TestWealthTechAPI:
             "content": "This comprehensive investment portfolio analysis examines client asset allocation strategies for 2024. The portfolio demonstrates strong performance with technology holdings representing 25% of total assets, healthcare at 20%, and financial services at 15%. Performance metrics show a 12% annual return over the past three years, outperforming the benchmark S&P 500 by 3.2%. Risk assessment reveals a beta coefficient of 0.85, indicating lower volatility than the overall market. Recommendations include rebalancing to maintain target allocations and considering ESG-focused investments."
         }
 
-        response = requests.post(f"{api_client}/clients/1/documents", json=doc_data)
+        response = requests.post(f"{api_client}/clients/2/documents", json=doc_data)
         assert response.status_code == 201
 
         result = response.json()
@@ -96,7 +96,7 @@ class TestWealthTechAPI:
             "content": "This advanced portfolio risk management guide provides comprehensive strategies for institutional investors. The document covers various risk assessment methodologies including Value at Risk (VaR), stress testing, and scenario analysis. Modern portfolio theory suggests diversification across asset classes to minimize risk while maximizing returns. Quantitative risk models help identify potential portfolio vulnerabilities and concentration risks. Regular monitoring of correlation patterns between assets is essential for effective risk management."
         }
 
-        response = requests.post(f"{api_client}/clients/1/documents", json=doc_data)
+        response = requests.post(f"{api_client}/clients/2/documents", json=doc_data)
         assert response.status_code == 201
 
         result = response.json()
@@ -115,7 +115,7 @@ class TestWealthTechAPI:
             os.environ["SUMMARIZER"] = mode
 
             response = requests.post(
-                f"{api_client}/clients/1/notes",
+                f"{api_client}/clients/2/notes",
                 json={"content": note_content}
             )
             assert response.status_code == 201
@@ -187,7 +187,7 @@ class TestWealthTechAPI:
             os.environ["SUMMARIZER"] = mode
 
             response = requests.post(
-                f"{api_client}/clients/1/documents",
+                f"{api_client}/clients/2/documents",
                 json={"title": f"{mode.title()} Quality Test", "content": test_content}
             )
             assert response.status_code == 201
@@ -211,7 +211,7 @@ class TestWealthTechAPI:
         assert response.status_code == 404
 
         # 422 - Invalid input (empty content)
-        response = requests.post(f"{api_client}/clients/1/documents", json={"title": "Test", "content": ""})
+        response = requests.post(f"{api_client}/clients/2/documents", json={"title": "Test", "content": ""})
         assert response.status_code == 422
 
         # 400 - Invalid search parameters
@@ -222,7 +222,7 @@ class TestWealthTechAPI:
         assert response.status_code == 400
 
         # 422 - Missing required fields
-        response = requests.post(f"{api_client}/clients/1/documents", json={"title": "Test"})
+        response = requests.post(f"{api_client}/clients/2/documents", json={"title": "Test"})
         assert response.status_code == 422
 
     def test_end_to_end_workflow(self, api_client):
@@ -231,7 +231,7 @@ class TestWealthTechAPI:
 
         # Create test document
         doc_response = requests.post(
-            f"{api_client}/clients/1/documents",
+            f"{api_client}/clients/2/documents",
             json={
                 "title": "E2E Test Investment Strategy",
                 "content": "This document outlines a comprehensive investment strategy for retirement planning. The strategy focuses on diversified portfolio allocation with emphasis on long-term growth and risk management."
@@ -242,7 +242,7 @@ class TestWealthTechAPI:
 
         # Create test note
         note_response = requests.post(
-            f"{api_client}/clients/1/notes",
+            f"{api_client}/clients/2/notes",
             json={
                 "content": "Client meeting to discuss investment strategy implementation. Client approved the diversified portfolio approach and agreed to monthly review meetings."
             }

@@ -1,0 +1,87 @@
+Investment Committee Meeting Minutes
+Date: October 10, 2024
+Time: 9:00 AM - 11:30 AM
+Location: Conference Room A / Virtual Hybrid
+
+Committee Members Present:
+- David Chen, CIO (Chair)
+- Sarah Martinez, Senior Portfolio Manager
+- Robert Kim, Research Analyst
+- Lisa Thompson, Risk Manager
+- Michael Rodriguez, Client Relations
+
+1. Market Review and Outlook
+
+David presented Q3 market performance:
+- S&P 500: +5.2% (quarter)
+- International developed: +3.8%
+- Emerging markets: +2.1%
+- Fixed income: +1.5%
+
+Key themes discussed:
+- Federal Reserve policy trajectory
+- Inflation trends and impact on sectors
+- Geopolitical tensions in Eastern Europe and Asia
+- Corporate earnings growth sustainability
+
+2. Asset Allocation Review
+
+Current model portfolio allocations reviewed:
+- Conservative: 30% equity, 65% fixed income, 5% alternatives
+- Moderate: 60% equity, 35% fixed income, 5% alternatives  
+- Aggressive: 80% equity, 15% fixed income, 5% alternatives
+
+Proposed changes for Q4:
+- Reduce growth stock allocation by 3-5%
+- Increase value stock exposure
+- Add inflation-protected securities (TIPS)
+- Maintain alternative investment allocation
+
+3. Individual Security Recommendations
+
+BUY Recommendations:
+- Johnson & Johnson (JNJ) - Defensive healthcare play
+- Berkshire Hathaway (BRK.B) - Value opportunity
+- Vanguard Real Estate ETF (VNQ) - Inflation hedge
+
+SELL Recommendations:
+- Tesla (TSLA) - Valuation concerns
+- Zoom (ZM) - Post-pandemic normalization
+- ARK Innovation ETF (ARKK) - High volatility
+
+HOLD Recommendations:
+- Apple (AAPL) - Monitor for entry point
+- Microsoft (MSFT) - Strong fundamentals
+- Amazon (AMZN) - Long-term growth story intact
+
+4. Risk Management Discussion
+
+Lisa presented portfolio risk metrics:
+- Average portfolio beta: 0.95
+- Maximum drawdown tolerance: -15%
+- Correlation analysis shows increased sector concentration
+- Stress testing results for various market scenarios
+
+Recommendations:
+- Implement stop-loss protocols for individual positions
+- Increase geographic diversification
+- Monitor sector concentration limits
+
+5. Client Communication Strategy
+
+Michael reported on client feedback:
+- 92% client satisfaction rate (up from 89% last quarter)
+- Main concerns: market volatility, retirement readiness
+- Request for more frequent communication during volatile periods
+- Interest in ESG investment options increasing
+
+Action Items:
+1. Implement Q4 allocation changes by October 15 (Sarah)
+2. Prepare client communication on portfolio changes (Michael)
+3. Research ESG fund options for client portfolios (Robert)
+4. Update risk monitoring dashboard (Lisa)
+5. Schedule individual client reviews for Q4 (All advisors)
+
+Next Meeting: November 10, 2024 at 9:00 AM
+
+Meeting Adjourned: 11:25 AM
