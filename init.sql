@@ -15,7 +15,8 @@ CREATE TABLE clients (
     tenant_id INT NOT NULL REFERENCES tenants(id),
     first_name TEXT,
     last_name TEXT,
-    email TEXT UNIQUE
+    email TEXT,
+    UNIQUE(tenant_id, email)
 );
 
 -- Documents
@@ -57,4 +58,7 @@ INSERT INTO tenants (id, name) VALUES (1, 'Default Tenant') ON CONFLICT (id) DO 
 -- Create a test client for development
 INSERT INTO clients (id, tenant_id, first_name, last_name, email) 
 VALUES (1, 1, 'Test', 'Client', 'test@example.com') 
-ON CONFLICT (email) DO NOTHING;
+ON CONFLICT (tenant_id, email) DO NOTHING;
+
+-- Fix sequence to start from correct value
+SELECT setval('clients_id_seq', (SELECT MAX(id) FROM clients));

@@ -34,8 +34,8 @@ if [ "$TENANT_ID" != "1" ]; then
     docker compose exec db psql -U user -d wealthtech_db -c "
     INSERT INTO tenants (id, name) VALUES ($TENANT_ID, 'Test Tenant $TENANT_ID') ON CONFLICT (id) DO NOTHING;
     INSERT INTO clients (tenant_id, first_name, last_name, email) 
-    VALUES ($TENANT_ID, 'Test', 'Client', 'test$TENANT_ID@example.com') 
-    ON CONFLICT (email) DO NOTHING;
+    VALUES ($TENANT_ID, 'Test', 'Client', 'test@example.com') 
+    ON CONFLICT (tenant_id, email) DO NOTHING;
     " > /dev/null
 fi
 

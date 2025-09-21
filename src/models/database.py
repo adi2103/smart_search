@@ -1,5 +1,5 @@
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 
@@ -18,7 +18,11 @@ class Client(Base):
     tenant_id = Column(Integer, ForeignKey("tenants.id"), nullable=False)
     first_name = Column(String)
     last_name = Column(String)
-    email = Column(String, unique=True)
+    email = Column(String)
+    
+    __table_args__ = (
+        UniqueConstraint('tenant_id', 'email', name='unique_tenant_email'),
+    )
 
 
 class Document(Base):
