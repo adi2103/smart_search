@@ -212,6 +212,43 @@ curl "http://localhost:8000/search?q=portfolio&type=note"
 - **Natural Transitions**: Content type doesn't determine position - only relevance does
 - **Consistent Ordering**: Document order (60→57→58→59) and note order (39→40→38→36→37) maintained across search modes
 - **Hybrid Scores**: RRF algorithm combines FTS + vector similarity for optimal relevance
+
+### Semantic Search Example
+
+**Upload Content with Different Terminology:**
+```bash
+# Upload document using "equity" terminology
+curl -X POST "http://localhost:8000/clients/1/documents" \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Equity Investment Analysis", "content": "Stock market investments require careful analysis of equity securities. This report examines share prices, dividend yields, and market capitalization trends for publicly traded companies."}'
+
+# Upload note using "stock/shares" terminology  
+curl -X POST "http://localhost:8000/clients/1/notes" \
+  -H "Content-Type: application/json" \
+  -d '{"content": "Client meeting about stock purchases. Discussed buying shares in technology companies and evaluating stock performance. Client interested in dividend-paying stocks for income generation."}'
+```
+
+**Search for "equity" - finds both despite different words:**
+```bash
+curl "http://localhost:8000/search?q=equity"
+```
+
+**Semantic Results:**
+```json
+{
+  "query": "equity",
+  "results": [
+    {"id": 61, "type": "document", "title": "Equity Investment Analysis", "score": 0.033},
+    {"id": 42, "type": "note", "title": null, "score": 0.015}
+  ]
+}
+```
+
+**Proof of Semantic Understanding:**
+- **Document**: Contains "equity securities" (exact match)
+- **Note**: Contains "stock purchases", "buying shares", "stocks" (semantic match)
+- **Result**: Both found despite note never using word "equity"
+- **Vector embeddings** recognize conceptual similarity between equity/stock/shares
 ```
 
 **Search Features:**
