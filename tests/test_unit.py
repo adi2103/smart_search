@@ -194,7 +194,7 @@ class TestConfiguration:
         # Clear SUMMARIZER to test default
         if "SUMMARIZER" in os.environ:
             del os.environ["SUMMARIZER"]
-            
+
         # Reload settings with mocked environment
         from importlib import reload
         from src import config
