@@ -24,18 +24,11 @@ jobs:
         pip install -r requirements.txt
         pip install pytest-cov
         
-    - name: Start services
+    - name: Run unit tests with coverage
       run: |
         export GEMINI_API_KEY="test-key"
         export TENANT_ID=1
-        docker compose up -d db
-        sleep 10
-        
-    - name: Run tests with coverage
-      run: |
-        export GEMINI_API_KEY="test-key"
-        export TENANT_ID=1
-        pytest tests/ --cov=src --cov-report=xml --cov-report=html
+        pytest tests/ -m "not integration" --cov=src --cov-report=xml --cov-report=html
         
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3

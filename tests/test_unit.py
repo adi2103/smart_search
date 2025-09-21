@@ -14,6 +14,7 @@ from src.config import settings
 from fastapi import HTTPException
 
 
+@pytest.mark.unit
 class TestSummarizerService:
     """Test summarizer service for regression prevention"""
 
@@ -67,6 +68,7 @@ class TestSummarizerService:
             mock_extractive_instance.summarize.assert_called_once()
 
 
+@pytest.mark.unit
 class TestSearchService:
     """Test RRF search algorithm for regression prevention"""
 
@@ -116,6 +118,7 @@ class TestSearchService:
         assert result_k60[0][1] != result_k10[0][1]
 
 
+@pytest.mark.unit
 class TestValidationService:
     """Test validation functions for security and regression prevention"""
 
@@ -160,6 +163,7 @@ class TestValidationService:
         assert "too long" in str(exc_info.value.detail)
 
 
+@pytest.mark.unit
 class TestEmbedderService:
     """Test embedder service edge cases"""
 
@@ -185,6 +189,7 @@ class TestEmbedderService:
         assert len(result1) == 384
 
 
+@pytest.mark.unit
 class TestConfiguration:
     """Test configuration settings"""
 

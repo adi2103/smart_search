@@ -2,9 +2,21 @@ import os
 from abc import ABC, abstractmethod
 from typing import Optional
 
+import nltk
 from sumy.nlp.tokenizers import Tokenizer
 from sumy.parsers.plaintext import PlaintextParser
 from sumy.summarizers.lex_rank import LexRankSummarizer
+
+# Download required NLTK data for extractive summarization
+try:
+    nltk.data.find('tokenizers/punkt_tab')
+except LookupError:
+    nltk.download('punkt_tab', quiet=True)
+
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt', quiet=True)
 
 
 class Summarizer(ABC):

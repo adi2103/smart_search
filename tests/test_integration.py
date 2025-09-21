@@ -10,6 +10,7 @@ import os
 BASE_URL = "http://localhost:8000"
 
 
+@pytest.mark.integration
 class TestWealthTechAPI:
     """Integration tests for WealthTech Smart Search API"""
 

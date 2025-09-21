@@ -323,22 +323,25 @@ bash clear_db.sh 2
 ```
 
 ### Test Coverage
-- **Unit Tests (17)**: Core business logic, edge cases, error handling
-- **Integration Tests (11)**: End-to-end API functionality, all summarization methods
+- **Unit Tests (17)**: Core business logic, edge cases, error handling - run without API
+- **Integration Tests (11)**: End-to-end API functionality, all summarization methods - require running API
 - **Load Testing**: Realistic financial documents and meeting notes with multi-tenant support
 - **Total Coverage**: 28+ tests covering search algorithms, AI integration, API contracts
 
+**Test Separation**: Unit tests run independently for CI/CD, integration tests require full API stack.
+
 ### Running Tests
 ```bash
-# All tests (requires running API with default tenant)
+# Unit tests only (~10s) - no API required
+python -m pytest tests/ -m "not integration" -v
+
+# Integration tests only (~70s) - requires running API
 TENANT_ID=1 docker compose up -d
-docker compose exec api python -m pytest tests/ -v
+python -m pytest tests/ -m integration -v
 
-# Unit tests only (~10s)
-docker compose exec api python -m pytest tests/test_unit.py -v
-
-# Integration tests (~25s)
-docker compose exec api python -m pytest tests/test_integration.py -v
+# All tests together (~80s) - requires running API
+TENANT_ID=1 docker compose up -d
+python -m pytest tests/ -v
 
 # End-to-end testing with realistic data
 cd tests
