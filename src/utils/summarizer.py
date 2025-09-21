@@ -9,14 +9,14 @@ from sumy.summarizers.lex_rank import LexRankSummarizer
 
 # Download required NLTK data for extractive summarization
 try:
-    nltk.data.find('tokenizers/punkt_tab')
+    nltk.data.find("tokenizers/punkt_tab")
 except LookupError:
-    nltk.download('punkt_tab', quiet=True)
+    nltk.download("punkt_tab", quiet=True)
 
 try:
-    nltk.data.find('tokenizers/punkt')
+    nltk.data.find("tokenizers/punkt")
 except LookupError:
-    nltk.download('punkt', quiet=True)
+    nltk.download("punkt", quiet=True)
 
 
 class Summarizer(ABC):

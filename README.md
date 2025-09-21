@@ -1,6 +1,12 @@
 # WealthTech Smart Search API
 
+A hybrid search system for financial advisors to search client documents and meeting notes using both keyword and semantic search, with AI-powered summarization.
+
+[![codecov](https://codecov.io/gh/yourusername/wealthtech-smart-search/branch/main/graph/badge.svg)](https://codecov.io/gh/yourusername/wealthtech-smart-search)
+
+## Table of Contents
 - [WealthTech Smart Search API](#wealthtech-smart-search-api)
+  - [Table of Contents](#table-of-contents)
   - [🔍 Key Features](#-key-features)
   - [🚀 Quick Start](#-quick-start)
     - [1. Clone \& Setup](#1-clone--setup)
@@ -27,9 +33,6 @@
     - [Common Issues](#common-issues)
 
 ---
-
-
-A hybrid search system for financial advisors to search client documents and meeting notes using both keyword and semantic search, with AI-powered summarization.
 
 ## 🔍 Key Features
 
